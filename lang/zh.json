@@ -1,0 +1,97 @@
+{
+  "hero": {
+    "title": "欢迎来到您的个人博物馆",
+    "subtitle": "收藏、管理并以虚拟展览的形式展示您的数字藏品。",
+    "explore_button": "开始探索"
+  },
+  "featured_sections": {
+    "title": "精选展览与藏品",
+    "view_details": "查看详情",
+    "experience_now": "立即体验",
+    "start_quiz": "开始测验"
+  },
+  "timeline_section": {
+    "title": "探索历史时间线",
+    "subtitle": "通过互动时间线，回顾重要的历史时刻和文化事件。",
+    "event1": {
+      "title": "文艺复兴的曙光",
+      "date": "14世纪 - 17世纪",
+      "description": "欧洲文化艺术的繁荣时期，标志着中世纪的结束和现代的开始。"
+    },
+    "event2": {
+      "title": "工业革命的浪潮",
+      "date": "18世纪 - 19世纪",
+      "description": "技术创新和生产方式的巨大变革，深刻影响了社会经济结构。"
+    },
+    "event3": {
+      "title": "信息时代的到来",
+      "date": "20世纪末 - 至今",
+      "description": "计算机和互联网的普及，开启了全球信息互联的新纪元。"
+    }
+  },
+  "cta_section": {
+    "title": "发现更多，创造无限",
+    "subtitle": "创建您自己的展览，分享您的独特视角，让您的数字藏品焕发新生。",
+    "create_button": "创建您的第一个展览"
+  },
+  "header": {
+    "app_name": "个人博物馆",
+    "nav": {
+      "home": "首页",
+      "explore": "探索",
+      "create": "创建",
+      "about": "关于"
+    },
+    "login_button": "登录",
+    "user_menu": {
+      "profile": "个人资料",
+      "settings": "设置",
+      "logout": "登出"
+    }
+  },
+  "footer": {
+    "project_name": "个人博物馆",
+    "all_rights_reserved": "保留所有权利。",
+    "about_us": "关于我们",
+    "contact": "联系",
+    "terms_of_service": "服务条款",
+    "privacy_policy": "隐私政策"
+  },
+  "login": {
+    "title": "Login to your account",
+    "register_title": "Create a new account",
+    "email_label": "Email address",
+    "email_placeholder": "Enter your email address",
+    "password_label": "Password",
+    "password_placeholder": "Enter your password",
+    "login_button": "Login",
+    "register_button": "Register",
+    "no_account_prompt": "Don't have an account? Register now",
+    "have_account_prompt": "Already have an account? Login here",
+    "registration_success_message": "Registration successful! Please check your email to confirm your account."
+  },
+  "about": {
+    "page_title": "关于个人博物馆项目",
+    "section_intro_title": "项目简介",
+    "section_intro_para1": "“个人博物馆”是一个创新的数字平台，旨在赋能每一位收藏爱好者，无论其收藏品类别如何，都能拥有一个专属于自己的在线虚拟博物馆。从珍贵的艺术品、历史悠久的文物，到独特的数字资产、模型手办，甚至是充满回忆的私人物品，这里都将是它们闪耀的舞台。我们致力于通过技术，让收藏品的管理、展示和分享变得前所未有的简单与有趣。",
+    "section_intro_para2": "我们深知每一件收藏品背后都蕴含着独特的故事和情感。因此，我们希望打破传统实体博物馆的界限，为个人收藏搭建一个无形的桥梁，使其能够被更广泛的受众所欣赏和理解。在这里，您不仅是收藏家，更是您个人藏品的策展人。",
+    "section_features_title": "核心功能亮点",
+    "feature1_title": "沉浸式个性化展览",
+    "feature1_desc": "用户可以根据主题、时间、类别等维度，自由创建多个虚拟展览空间。每个展览都可独立设计布局，确保您的藏品以最吸引人的方式呈现。",
+    "feature2_title": "详尽的藏品档案管理",
+    "feature2_desc": "为每一件收藏品提供丰富的元数据字段，包括高分辨率图片、多角度视图、详细的描述、购买或获取来源、历史沿革、鉴定信息等，让每一件物品的故事得以完整记录。",
+    "feature3_title": "直观易用的管理后台",
+    "feature3_desc": "简洁而强大的后台管理界面，支持批量上传、快速编辑、智能分类和搜索功能，让您轻松掌控您的数字博物馆。",
+    "feature4_title": "灵活多样的分享机制",
+    "feature4_desc": "您可以选择将整个博物馆或特定展览对外公开，生成可分享的链接，轻松分享至社交媒体；也可以设定为私有，仅供指定用户访问。",
+    "feature5_title": "互动与社区（未来规划）",
+    "feature5_desc": "未来版本将考虑加入评论、点赞、用户间互访等互动功能，逐步构建一个收藏爱好者社区，让分享和交流更有价值。",
+    "section_tech_title": "技术栈与架构",
+    "section_tech_desc": "本项目采用现代化的前端框架和后端服务，旨在提供高性能、高可靠性和可扩展性。",
+    "tech_frontend": "前端",
+    "tech_backend": "后端",
+    "tech_deployment": "部署",
+    "section_vision_title": "我们的愿景",
+    "section_vision_desc": "我们相信，每一份热爱都值得被记录与分享。“个人博物馆”项目致力于成为全球收藏爱好者首选的数字化管理和展示平台，让您的收藏不仅仅是物品，更是连接世界、传递文化的桥梁。我们期待与您一同，开启数字策展的新篇章。"
+  }
+}

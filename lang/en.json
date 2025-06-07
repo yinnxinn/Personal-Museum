@@ -1,0 +1,83 @@
+{
+  "hero": {
+    "title": "Welcome to Your Personal Museum",
+    "subtitle": "Collect, manage, and showcase your digital collections through virtual exhibitions.",
+    "explore_button": "Start Exploring"
+  },
+  "featured_sections": {
+    "title": "Featured Exhibitions & Collections",
+    "view_details": "View Details",
+    "experience_now": "Experience Now",
+    "start_quiz": "Start Quiz"
+  },
+  "cta_section": {
+    "title": "Discover More, Create Limitless",
+    "subtitle": "Create your own exhibitions, share your unique perspective, and bring your digital collections to life.",
+    "create_button": "Create Your First Exhibition"
+  },
+  "header": {
+    "app_name": "Personal Museum",
+    "nav": {
+      "home": "Home",
+      "explore": "Explore",
+      "create": "Create",
+      "about": "About"
+    },
+    "login_button": "Login",
+    "user_menu": {
+      "profile": "Profile",
+      "settings": "Settings",
+      "logout": "Logout"
+    }
+  },
+  "footer": {
+    "project_name": "Personal Museum",
+    "all_rights_reserved": "All rights reserved.",
+    "about_us": "About Us",
+    "contact": "Contact",
+    "terms_of_service": "Terms of Service",
+    "privacy_policy": "Privacy Policy"
+  },
+  
+  "new_activity": {
+    "title": "Interactive Timeline",
+    "description": "Explore historical events through an interactive timeline."
+  },
+  "login": {
+    "title": "Login to your account",
+    "register_title": "Create a new account",
+    "email_label": "Email address",
+    "email_placeholder": "Enter your email address",
+    "password_label": "Password",
+    "password_placeholder": "Enter your password",
+    "login_button": "Login",
+    "register_button": "Register",
+    "no_account_prompt": "Don't have an account? Register now",
+    "have_account_prompt": "Already have an account? Login here",
+    "registration_success_message": "Registration successful! Please check your email to confirm your account."
+  },
+  "about": {
+    "page_title": "About the Personal Museum Project",
+    "section_intro_title": "Project Introduction",
+    "section_intro_para1": "\"My Personal Museum\" is an innovative digital platform designed to empower every collection enthusiast, regardless of the category of their collectibles, to have their own dedicated online virtual museum. From precious artworks, historical artifacts, unique digital assets, models and figures, to cherished personal items, this platform will be their shining stage. We are committed to making the management, display, and sharing of collections unprecedentedly simple and enjoyable through technology.",
+    "section_intro_para2": "We understand that every collectible holds a unique story and emotion. Therefore, we aim to break the boundaries of traditional physical museums, building an invisible bridge for personal collections, allowing them to be appreciated and understood by a wider audience. Here, you are not just a collector, but the curator of your own personal collection.",
+    "section_features_title": "Core Features Highlight",
+    "feature1_title": "Immersive Personalized Exhibitions",
+    "feature1_desc": "Users can freely create multiple virtual exhibition spaces based on themes, time periods, categories, and other dimensions. Each exhibition can be independently designed for layout, ensuring your collections are presented in the most captivating way.",
+    "feature2_title": "Comprehensive Collection Archiving & Management",
+    "feature2_desc": "Provide rich metadata fields for each collectible, including high-resolution images, multi-angle views, detailed descriptions, acquisition sources, historical context, appraisal information, and more, ensuring the complete story of each item is recorded.",
+    "feature3_title": "Intuitive and Easy-to-Use Admin Panel",
+    "feature3_desc": "A concise yet powerful backend management interface supports batch uploads, quick editing, intelligent categorization, and search functions, allowing you to easily control your digital museum.",
+    "feature4_title": "Flexible and Diverse Sharing Mechanisms",
+    "feature4_desc": "You can choose to make your entire museum or specific exhibitions public, generate shareable links for easy sharing on social media; or set them as private, accessible only to designated users.",
+    "feature5_title": "Interaction and Community (Future Planning)",
+    "feature5_desc": "Future versions will consider adding interactive features such as comments, likes, and inter-user visits, gradually building a community of collectors, making sharing and exchange more valuable.",
+    "section_tech_title": "Technology Stack & Architecture",
+    "section_tech_desc": "This project adopts modern frontend frameworks and backend services, aiming to provide high performance, reliability, and scalability.",
+    "tech_frontend": "Frontend",
+    "tech_backend": "Backend",
+    "tech_deployment": "Deployment",
+    "section_vision_title": "Our Vision",
+    "section_vision_desc": "We believe that every passion deserves to be recorded and shared. The \"Personal Museum\" project aims to become the preferred digital management and display platform for collectors worldwide, making your collection not just items, but a bridge connecting the world and transmitting culture. We look forward to embarking on a new chapter of digital curation with you."
+  }
+}

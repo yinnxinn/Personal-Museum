@@ -1,0 +1,161 @@
+<template>
+    <div class="container mx-auto px-4 py-18">
+        <div class="hidden md:block bg-[url(/bg.jpg)] bg-local md:bg-fixed md:max-h-[300px] md:overflow-hidden">
+            <img :src="exhibit.cover" class="w-full h-full object-cover">
+        </div>
+        <div class="text-center px-4 py-6 mb-6">
+            <!-- 标题 -->
+            <h1 class="text-3xl font-semibold text-gray-900 mb-4">{{ exhibit.title }}</h1>
+
+            <!-- 操作图标 -->
+            <div class="flex justify-center items-center space-x-6 text-gray-600 text-xl mb-4">
+                <button class="hover:text-red-500 transition">
+                    <FontAwesomeIcon icon="fa-solid fa-heart" />
+                </button>
+                <button class="hover:text-blue-500 transition">
+                    <FontAwesomeIcon icon="fa-solid fa-link" />
+                </button>
+                <button class="hover:text-blue-700 transition">
+                    <FontAwesomeIcon icon="fa-brands fa-facebook" />
+                </button>
+                <button class="hover:text-black transition">
+                    <FontAwesomeIcon icon="fa-brands fa-x-twitter" />
+                </button>
+                <button class="hover:text-gray-700 transition">
+                    <FontAwesomeIcon icon="fa-share-alt" />
+                </button>
+                <button class="hover:text-gray-700 transition">
+                    <FontAwesomeIcon icon="fa-solid fa-eye" />
+                </button>
+
+
+            </div>
+
+            <!-- 描述内容 -->
+            <p class="text-gray-700 text-base leading-relaxed mb-2 px-4 max-w-2xl mx-auto transition-all duration-300 text-left"
+                :class="!showFullDescription ? 'line-clamp-3' : ''">
+                {{ exhibit.description }}
+            </p>
+
+            <!-- 展开/收起 -->
+            <div v-if="shouldShowToggle" class="mt-2">
+                <button @click="showFullDescription = !showFullDescription"
+                    class="text-blue-600 hover:underline text-sm">
+                    {{ showFullDescription ? '收起详情' : '展开详情' }}
+                </button>
+            </div>
+        </div>
+
+
+        <div v-if="exhibit.datas" class="bg-white rounded-lg overflow-hidden">
+            <!-- <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 p-4">
+                <div v-for="item in exhibit.datas" :key="item.id" class="relative rounded-lg overflow-hidden">
+                    <div class="aspect-w-1 aspect-h-1">
+                        <img :src="item.imageUrl" :alt="item.title" class="w-full h-full object-cover" />
+                        <div class="absolute bottom-0 left-0 px-3 py-2">
+                            <p class="text-gray-800 text-sm font-semibold">{{ item.title }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div> -->
+
+
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 p-4" ref="gallery">
+                <a v-for="item in exhibit.datas" :key="item.id" :href="item.imageUrl"
+                    class="relative rounded-lg overflow-hidden" :data-lg-size="'1600-1067'">
+                    <div class="aspect-w-1 aspect-h-1">
+                        <img :src="item.imageUrl" :alt="item.title" class="w-full h-full object-cover" />
+                        <div class="absolute bottom-0 left-0 px-3 py-2">
+                            <p class="text-white text-sm font-semibold">{{ item.title }}</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+        </div>
+
+
+        <div v-else class="text-center py-12">
+            <p class="text-xl text-gray-600">Loading exhibit or exhibit not found...</p>
+        </div>
+    </div>
+</template>
+
+<script setup>
+import { useRoute } from 'vue-router';
+import { ref, onMounted, nextTick } from 'vue';
+import { createClient } from '@supabase/supabase-js';
+
+// 初始化Supabase客户端
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_KEY;
+const supabase = createClient(supabaseUrl, supabaseKey);
+
+const route = useRoute();
+const exhibitId = route.params.id;
+const exhibit = ref({
+  title: "",
+  coverUrl: "",
+  description: "",
+  datas: []
+});
+const showFullDescription = ref(false);
+const shouldShowToggle = ref(true);
+const gallery = ref(null);
+
+// 从Supabase获取展品数据
+const fetchExhibitData = async (id) => {
+  try {
+    // 获取展品基本信息
+    const { data: exhibitData, error: exhibitError } = await supabase
+      .from('exhibits')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (exhibitError) throw exhibitError;
+    
+    // 获取关联的图片数据
+    const { data: imagesData, error: imagesError } = await supabase
+      .from('exhibit_datas')  // 替换为你的图片表名
+      .select('id, imageUrl, title')
+      .eq('exhibit_id', id);  // 替换为你的外键字段名
+
+    if (imagesError) throw imagesError;
+
+    // 更新响应式数据
+    exhibit.value = {
+      ...exhibitData,
+      datas: imagesData || []
+    };
+
+    // 检查是否需要显示详情切换按钮
+    shouldShowToggle.value = exhibitData.description?.length > 150;
+
+    return exhibitData;
+  } catch (error) {
+    console.error('获取展品数据失败:', error);
+    return null;
+  }
+};
+
+onMounted(async () => {
+  await fetchExhibitData(exhibitId);
+  
+  // 等待DOM更新后初始化画廊
+  nextTick(() => {
+    if (gallery.value && exhibit.value.datas.length > 0) {
+      lightGallery(gallery.value, {
+        selector: 'a',
+        plugins: [lgZoom, lgThumbnail],
+        speed: 300,
+        download: false,
+      });
+    }
+  });
+});
+</script>
+
+<style scoped>
+/* Add any specific styles for this page here */
+</style>
