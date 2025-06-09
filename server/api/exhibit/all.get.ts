@@ -9,8 +9,10 @@ export default defineEventHandler(async (event: H3Event) => {
   const category = (query.category as string) || '';
   const search = (query.search as string) || '';
 
-  const from = page * pageSize;
+  const from = (page-1) * pageSize;
   const to = from + pageSize - 1;
+
+  console.log('searching', from, to)
 
   try {
     // 构建基本查询
@@ -53,13 +55,6 @@ export default defineEventHandler(async (event: H3Event) => {
     })) || [];
 
 
-    console.log({
-        exhibits,
-        total: count ?? 0,
-        page,
-        pageSize,
-        hasMore: (count ?? 0) > (to + 1),
-      })
 
     return {
       exhibits,

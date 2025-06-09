@@ -95,6 +95,12 @@
 import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import draggable from 'vuedraggable';
+const { $auth } = useNuxtApp()
+
+definePageMeta({
+  middleware: 'auth', // 指定应用 'auth' 中间件
+  requiresAuth: true, // 自定义一个属性，用于在中间件中判断
+});
 
 const route = useRoute();
 const router = useRouter();
@@ -214,6 +220,8 @@ const saveExhibit = async () => {
         if (exhibit.value.coverUrl === item.previewUrl) {
           exhibit.value.coverUrl = imageUrl;
         }
+        item.author = $auth.user.value.id;
+        item.exhibitId = exhibit.value.id;
         item.imageUrl = imageUrl;
         item.previewUrl = imageUrl; // Keep previewUrl for consistency
         delete item.file; // Remove the file object as it's no longer needed
@@ -233,10 +241,11 @@ const saveExhibit = async () => {
       title: exhibit.value.title,
       description: exhibit.value.description,
       privacy: exhibit.value.privacy || 'public',
+      author: $auth.user.value.id,
       coverUrl: exhibit.value.coverUrl, // Include the cover URL
       // Ensure only necessary properties are sent to the backend for items
-      items: exhibit.value.items.map(({ id, imageUrl, title, description }) => ({
-        id, imageUrl, title, description
+      items: exhibit.value.items.map(({ imageUrl, title, description , author, exhibitId}) => ({
+        imageUrl, title, description, author, exhibitId
       })),
     };
 

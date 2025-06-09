@@ -6,8 +6,6 @@ export default defineEventHandler(async (event: H3Event) => {
   const body = await readBody(event);
   const { id, title, description, privacy, items } = body;
 
-  console.log(id, title, description, privacy, items)
-
   if (!id || !title || !description || !privacy || !items) {
     throw createError({
       statusCode: 400,
@@ -76,11 +74,13 @@ export default defineEventHandler(async (event: H3Event) => {
     // Insert new items
     if (itemsToInsert.length > 0) {
       const formattedNewItems = itemsToInsert.map((item: any) => ({
-        exhibit_id: id,
+        exhibitId: id,
         image_url: item.imageUrl, // This should be the URL from Supabase Storage
         title: item.title,
         description: item.description,
       }));
+
+      console.log( formattedNewItems , '11111111')
       const { error: insertError } = await supabase
         .from('images')
         .insert(formattedNewItems);

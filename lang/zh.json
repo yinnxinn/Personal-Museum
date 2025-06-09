@@ -13,21 +13,8 @@
   "timeline_section": {
     "title": "探索历史时间线",
     "subtitle": "通过互动时间线，回顾重要的历史时刻和文化事件。",
-    "event1": {
-      "title": "文艺复兴的曙光",
-      "date": "14世纪 - 17世纪",
-      "description": "欧洲文化艺术的繁荣时期，标志着中世纪的结束和现代的开始。"
-    },
-    "event2": {
-      "title": "工业革命的浪潮",
-      "date": "18世纪 - 19世纪",
-      "description": "技术创新和生产方式的巨大变革，深刻影响了社会经济结构。"
-    },
-    "event3": {
-      "title": "信息时代的到来",
-      "date": "20世纪末 - 至今",
-      "description": "计算机和互联网的普及，开启了全球信息互联的新纪元。"
-    }
+    "associated_exhibits_title": "相关展览"
+    
   },
   "cta_section": {
     "title": "发现更多，创造无限",

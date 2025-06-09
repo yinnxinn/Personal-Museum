@@ -1,2 +1,22 @@
-User-Agent: *
+User-agent: *
+Allow: /
+Disallow: /login
+Disallow: /profile
+Disallow: /settings
+Disallow: /exhibit/create
+
+# 允许所有静态资源
+Allow: /*.js
+Allow: /*.css
+Allow: /*.png
+Allow: /*.jpg
+Allow: /*.jpeg
+Allow: /*.gif
+Allow: /*.svg
+Allow: /*.ico
+
+# 指向Sitemap
+Sitemap: https://personal-museum.nilco2.com/sitemap.xml
 Disallow:
+
+Sitemap: https://personal-museum.nilco2.com/api/sitemap.xml

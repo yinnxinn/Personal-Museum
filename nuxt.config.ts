@@ -1,6 +1,7 @@
 import tailwindcss from "@tailwindcss/vite";
 import path from 'path';
 
+// 在现有配置中添加
 export default defineNuxtConfig({
   ssr: true,
   modules: [
@@ -45,15 +46,20 @@ export default defineNuxtConfig({
     redirectOptions: {
       login: '/login',
       callback: '/confirm',
-      exclude: [ '/',
+      exclude: ['/',
         '/en/',                        // Homepage (index.vue)
-        '/about',   
-        '/en/about',   
+        '/about',
+        '/en/about',
         '/explore',                // about.vue
         '/en/explore',                // about.vue
         '/exhibit/*',
         '/en/exhibit/*'
-      ]          
+      ]
     },
-  }
+  },
+  runtimeConfig: {
+    public: {
+      siteUrl: process.env.SITE_URL || 'https://personal-museum.nilco2.com/',
+    }
+  },
 })

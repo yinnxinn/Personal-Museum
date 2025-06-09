@@ -10,6 +10,11 @@
     "experience_now": "Experience Now",
     "start_quiz": "Start Quiz"
   },
+  "timeline_section":{
+    "associated_exhibits_title": "Associated Exhibits",
+    "title":"Explore Historical Timeline",
+    "subtitle": "Interactively explore historical events through an interactive timeline."
+  },
   "cta_section": {
     "title": "Discover More, Create Limitless",
     "subtitle": "Create your own exhibitions, share your unique perspective, and bring your digital collections to life.",

@@ -4,7 +4,9 @@ import { H3Event, readBody, createError } from 'h3';
 
 export default defineEventHandler(async (event: H3Event) => {
   const body = await readBody(event);
-  const { title, description, privacy, items, coverUrl } = body;
+
+
+  const { title, description, privacy, items, coverUrl, author } = body;
 
   if (!title || !description || !privacy || !items) {
     throw createError({
@@ -21,7 +23,8 @@ export default defineEventHandler(async (event: H3Event) => {
         title,
         description,
         privacy,
-        coverUrl
+        coverUrl,
+        author
         // You might want to add author_id here if you have user authentication
         // author_id: event.context.user.id,
       })
@@ -38,7 +41,7 @@ export default defineEventHandler(async (event: H3Event) => {
 
     // 2. Insert exhibit items (images)
     const exhibitItemsToInsert = items.map((item: any) => ({
-      exhibitId: newExhibit.id,
+      exhibit_id: newExhibit.id,
       image_url: item.imageUrl, // This should be the URL from Supabase Storage
       title: item.title,
       description: item.description,

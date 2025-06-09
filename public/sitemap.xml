@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <!-- 主页 -->
+  <url>
+    <loc>https://personal-museum.nilco2.com//</loc>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://personal-museum.nilco2.com/" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://personal-museum.nilco2.com/en/" />
+  </url>
+  
+  <!-- 关于页面 -->
+  <url>
+    <loc>https://personal-museum.nilco2.com/about</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://personal-museum.nilco2.com/about" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://personal-museum.nilco2.com/en/about" />
+  </url>
+  
+  <!-- 探索页面 -->
+  <url>
+    <loc>https://personal-museum.nilco2.com/explore</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://personal-museum.nilco2.com/explore" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://personal-museum.nilco2.com/en/explore" />
+  </url>
+  
+  <!-- 动态生成的展览页面示例 -->
+  <!-- 注意：实际使用时，您应该从数据库中获取所有公开展览的ID，并为每个ID生成一个URL条目 -->
+  <url>
+    <loc>https://personal-museum.nilco2.com/exhibit/ecfc6f8e-1b81-491f-84ac-f0522c40951e</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://personal-museum.nilco2.com/exhibit/ecfc6f8e-1b81-491f-84ac-f0522c40951e" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://personal-museum.nilco2.com/en/exhibit/ecfc6f8e-1b81-491f-84ac-f0522c40951e" />
+  </url>
+</urlset>
