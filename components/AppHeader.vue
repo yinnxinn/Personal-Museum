@@ -63,6 +63,7 @@
 import { ref } from 'vue';
 import { useI18n, useLocalePath, useNuxtApp } from '#imports';
 import { useRouter } from 'vue-router';
+import { Analytics } from '@vercel/analytics/nuxt'
 
 const { locale, setLocale } = useI18n();
 const localePath = useLocalePath();
