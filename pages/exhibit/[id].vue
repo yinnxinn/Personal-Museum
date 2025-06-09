@@ -159,6 +159,16 @@ const exhibit = ref({
     description: '',
     datas: []
 });
+
+useSeoMeta({
+  title: () => exhibit.value.title || '数字博物馆',
+  ogTitle: () => exhibit.value.title || '数字博物馆',
+  description: () => exhibit.value.description?.slice(0, 150) || '一个精彩的数字展览，欢迎来参观！',
+  ogDescription: () => exhibit.value.description?.slice(0, 150) || '一个精彩的数字展览，欢迎来参观！',
+  ogImage: () => exhibit.value.coverUrl || '/default-cover.jpg',
+  twitterCard: 'summary_large_image'
+})
+
 const showFullDescription = ref(false);
 const shouldShowToggle = ref(true);
 const page = ref(1);

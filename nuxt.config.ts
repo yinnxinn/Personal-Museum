@@ -2,7 +2,7 @@ import tailwindcss from "@tailwindcss/vite";
 import path from 'path';
 
 export default defineNuxtConfig({
-  ssr: false,
+  ssr: true,
   modules: [
     '@nuxtjs/i18n', // 添加 i18n 模块
     '@nuxtjs/supabase',

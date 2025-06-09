@@ -21,9 +21,9 @@ export default defineEventHandler(async (event: H3Event) => {
   try {
     // 先查一次该展品是否存在（避免空数据导致无法提取title等）
     const { data: headData, error: headError } = await supabase
-      .from('images')
-      .select('title, description, image_url, created_at, author')
-      .eq('exhibitId', id)
+      .from('exhibits')
+      .select('id, title, description, coverUrl, created_at, author')
+      .eq('id', id)
       .limit(1);
 
     if (headError) {
