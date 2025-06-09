@@ -1,6 +1,7 @@
 <template>
   <header class="bg-white shadow-md py-4">
     <nav class="container mx-auto px-4 md:px-2 flex justify-between items-center">
+      <Analytics />
       <NuxtLink :to="localePath('/')" class="flex items-center space-x-2">
         <img src="/favicon.ico" alt="Personal Museum Logo" class="h-10 w-10 rounded-full">
         <span class="text-2xl font-bold text-gray-800">{{ $t('header.app_name') }}</span>
