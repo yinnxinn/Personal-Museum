@@ -31,8 +31,7 @@
           <div v-for="item in exhibit.items" :key="item.id"
             :class="['relative border rounded-lg overflow-hidden cursor-pointer', { 'ring-2 ring-indigo-500': exhibit.coverUrl === (item.imageUrl || item.previewUrl) }]"
             @click="selectCoverImage(item)">
-            <img :src="item.previewUrl || item.imageUrl" :alt="item.title || '图片预览'"
-              class="w-full h-24 object-cover">
+            <img :src="item.previewUrl || item.imageUrl" :alt="item.title || '图片预览'" class="w-full h-24 object-cover">
             <div
               class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center text-white text-sm font-semibold opacity-0 hover:opacity-100 transition-opacity">
               选择为封面
@@ -82,7 +81,7 @@
       </div>
 
       <div class="mt-8">
-        <button type="submit"
+        <button type="submit" :disabled='sending'
           class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
           {{ exhibitId ? '更新展品' : '创建展品' }}
         </button>
@@ -102,6 +101,7 @@ definePageMeta({
   requiresAuth: true, // 自定义一个属性，用于在中间件中判断
 });
 
+const sending = ref(false);
 const route = useRoute();
 const router = useRouter();
 const exhibitId = route.query.id; // Get ID from query parameters for editing
@@ -210,6 +210,7 @@ const uploadImage = async (file) => {
 };
 
 const saveExhibit = async () => {
+  sending.value = true;
   try {
     // 1. Upload new images and update coverUrl if it was a new image
     const uploadPromises = exhibit.value.items
@@ -244,7 +245,7 @@ const saveExhibit = async () => {
       author: $auth.user.value.id,
       coverUrl: exhibit.value.coverUrl, // Include the cover URL
       // Ensure only necessary properties are sent to the backend for items
-      items: exhibit.value.items.map(({ imageUrl, title, description , author, exhibitId}) => ({
+      items: exhibit.value.items.map(({ imageUrl, title, description, author, exhibitId }) => ({
         imageUrl, title, description, author, exhibitId
       })),
     };
@@ -272,14 +273,18 @@ const saveExhibit = async () => {
 
     if (!apiResponse.ok) {
       const errorData = await apiResponse.json();
+      sending.value = false;
       throw new Error(errorData.statusMessage || `Failed to ${exhibitId ? 'update' : 'create'} exhibit`);
+
     }
 
     const responseData = await apiResponse.json();
     alert(responseData.message);
+    sending.value = false;
     router.push('/'); // Navigate to the home or exhibit list page after saving
   } catch (error) {
     console.error('Error saving exhibit:', error);
+    sending.value = false;
     alert(`保存展品失败: ${error.message}`);
   }
 };

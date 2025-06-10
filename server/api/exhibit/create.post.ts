@@ -39,15 +39,36 @@ export default defineEventHandler(async (event: H3Event) => {
       });
     }
 
+    //1.5 insert perssmission 
+    const { data: idx, error: error } = await supabase
+      .from('exhibit_permissions')
+      .insert({
+        userId: author,
+        exhibitId: newExhibit.id,
+        role: 'owner'
+        // You might want to add author_id here if you have user authentication
+        // author_id: event.context.user.id,
+      })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Supabase insert perssmission error:', error);
+      throw createError({
+        statusCode: 500,
+        statusMessage: 'Failed to create exhibit perssmission.',
+      });
+    }
+
+
+
     // 2. Insert exhibit items (images)
     const exhibitItemsToInsert = items.map((item: any) => ({
-      exhibit_id: newExhibit.id,
+      exhibitId: newExhibit.id,
       image_url: item.imageUrl, // This should be the URL from Supabase Storage
       title: item.title,
       description: item.description,
     }));
-
-    console.log( 'inserting items', exhibitItemsToInsert)
 
     if (exhibitItemsToInsert.length > 0) {
       const { error: itemsError } = await supabase

@@ -38,7 +38,7 @@ export default defineEventHandler(async (event: H3Event) => {
         "coverUrl",
         created_at,
         author
-      `)
+      `).eq('privacy', 'public')
       .gte('created_at', period.start.toISOString()) // Greater than or equal to start date
       .lte('created_at', period.end.toISOString())   // Less than or equal to end date
       .order('created_at', { ascending: false })     // Order by newest first

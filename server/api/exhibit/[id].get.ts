@@ -22,7 +22,7 @@ export default defineEventHandler(async (event: H3Event) => {
     // 先查一次该展品是否存在（避免空数据导致无法提取title等）
     const { data: headData, error: headError } = await supabase
       .from('exhibits')
-      .select('id, title, description, coverUrl, created_at, author')
+      .select('id, title, description, coverUrl, created_at, author, privacy')
       .eq('id', id)
       .limit(1);
 
@@ -67,12 +67,14 @@ export default defineEventHandler(async (event: H3Event) => {
         cover: exhibitInfo.image_url,
         createdAt: exhibitInfo.created_at,
         author: exhibitInfo.author,
+        privacy: exhibitInfo.privacy,
         datas: items?.map((item) => ({
           id: item.id,
           title: item.title,
           description: item.description,
           imageUrl: item.image_url,
           author: item.author
+          
         })) || [],
       },
       pagination: {

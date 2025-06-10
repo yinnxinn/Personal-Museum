@@ -12,15 +12,13 @@ export default defineEventHandler(async (event: H3Event) => {
   const from = (page-1) * pageSize;
   const to = from + pageSize - 1;
 
-  console.log('searching', from, to)
-
   try {
     // 构建基本查询
     let queryBuilder = supabase
       .from('exhibits')
       .select('id, title, description, coverUrl, created_at, author', 
         { count: 'exact' }
-      )
+      ).eq('privacy', 'public')
       .order('created_at', { ascending: false })
       .range(from, to);
 

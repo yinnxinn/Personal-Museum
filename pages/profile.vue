@@ -63,7 +63,7 @@
       </div>
 
       <div v-else-if="activeTab === 'created'">
-        <h2 class="text-2xl font-semibold text-gray-800 mb-4">我创建的展品</h2>
+        <h2 class="text-2xl font-semibold text-gray-800 mb-4">我参与的展品</h2>
         <div v-if="createdExhibits.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           <div v-for="exhibit in createdExhibits" :key="exhibit.id"
             class="border rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200 flex flex-col h-full">
@@ -106,6 +106,9 @@ const activeTab = ref('liked');
 const likedExhibits = ref([]);
 const createdExhibits = ref([]);
 
+const likedExhibitsLoaded = ref(false);
+const createdExhibitsLoaded = ref(false);
+
 // 从 $auth 插件中获取加载状态，或者定义自己的局部加载状态
 const loadingUser = $auth.isLoading; // 直接使用 auth 插件的 loading 状态
 const loadingExhibits = ref(true); // 展品加载状态仍需单独管理
@@ -114,28 +117,19 @@ const loadingExhibits = ref(true); // 展品加载状态仍需单独管理
 const fetchLikedExhibits = async (userId) => {
   if (!userId) return [];
   try {
-    const { data: likedActions, error: actionsError } = await supabase // 使用 useSupabaseClient 获取的实例
-      .from('actions')
-      .select('exhibitId')
-      .eq('userId', userId)
-      .eq('likes', true);
+    // Use Nuxt's useFetch for server-side rendering benefits and automatic data unwrapping
+    const { data, error } = await useFetch(`/api/exhibit/liked`, {
+      query: { userId: userId },
+      key: `liked-exhibits-${userId}`, // Unique key for caching useFetch data
+    });
 
-    if (actionsError) throw actionsError;
-
-    const exhibitIds = likedActions.map(action => action.exhibitId);
-
-    if (exhibitIds.length === 0) return [];
-
-    const { data: exhibits, error: exhibitsError } = await supabase // 使用 useSupabaseClient 获取的实例
-      .from('exhibits')
-      .select('id, title, description, coverUrl')
-      .in('id', exhibitIds);
-
-    if (exhibitsError) throw exhibitsError;
-    return exhibits;
-
+    if (error.value) {
+      console.error('获取喜欢的展品失败 (API Error):', error.value.message);
+      return [];
+    }
+    return data.value.exhibits || []; // Access the 'exhibits' property from the API response
   } catch (error) {
-    console.error('获取喜欢的展品失败:', error.message);
+    console.error('获取喜欢的展品失败 (Client Error):', error.message);
     return [];
   }
 };
@@ -144,36 +138,25 @@ const fetchLikedExhibits = async (userId) => {
 const fetchCreatedExhibits = async (userId) => {
   if (!userId) return [];
   try {
-    const { data, error } = await supabase // 使用 useSupabaseClient 获取的实例
-      .from('exhibits')
-      .select('id, title, description, coverUrl')
-      .eq('author', userId);
+    // Use Nuxt's useFetch
+    const { data, error } = await useFetch(`/api/exhibit/created`, {
+      query: { userId: userId },
+      key: `created-exhibits-${userId}`, // Unique key for caching useFetch data
+    });
 
-    if (error) throw error;
-    return data;
+    if (error.value) {
+      console.error('获取创建的展品失败 (API Error):', error.value.message);
+      return [];
+    }
+    return data.value.exhibits || []; // Access the 'exhibits' property from the API response
   } catch (error) {
-    console.error('获取创建的展品失败:', error.message);
+    console.error('获取创建的展品失败 (Client Error):', error.message);
     return [];
   }
 };
 
 // --- 统一的数据获取逻辑 ---
-const fetchData = async () => {
-  loadingExhibits.value = true;
-  if ($auth.user.value) { // 使用 $auth.user.value 来获取当前用户
-    const userId = $auth.user.value.id;
-    const [likedData, createdData] = await Promise.all([
-      fetchLikedExhibits(userId),
-      fetchCreatedExhibits(userId)
-    ]);
-    likedExhibits.value = likedData;
-    createdExhibits.value = createdData;
-  } else {
-    likedExhibits.value = [];
-    createdExhibits.value = [];
-  }
-  loadingExhibits.value = false;
-};
+
 
 // 组件挂载时执行
 onMounted(async () => {
@@ -184,11 +167,43 @@ onMounted(async () => {
 });
 
 // 监听 $auth.user 的变化，以便在登录/登出后重新加载展品
-watch($auth.user, async (newVal, oldVal) => {
-  if (newVal?.id !== oldVal?.id) { // 仅当用户ID发生实际变化时才重新获取数据
-    await fetchData();
+// watch($auth.user, async (newVal, oldVal) => {
+//   if (newVal?.id !== oldVal?.id) { // 仅当用户ID发生实际变化时才重新获取数据
+//     await fetchData();
+//   }
+// }, { immediate: true }); // immediate: true 确保在组件初次挂载时也执行一次 fetchData
+watch([activeTab, $auth.user], async ([newTab, newUser], [oldTab, oldUser]) => {
+  // Reset loaded flags if user changes (e.g., logout/login)
+  if (newUser?.id !== oldUser?.id) {
+    likedExhibitsLoaded.value = false;
+    createdExhibitsLoaded.value = false;
+    // Clear existing data when user changes to avoid showing old data
+    likedExhibits.value = [];
+    createdExhibits.value = [];
   }
-}, { immediate: true }); // immediate: true 确保在组件初次挂载时也执行一次 fetchData
+
+  // Only proceed if user is logged in and not currently loading user info
+  if ($auth.user.value && !$auth.isLoading.value) {
+    const userId = $auth.user.value.id;
+
+    if (newTab === 'liked' && !likedExhibitsLoaded.value) {
+      loadingExhibits.value = true;
+      likedExhibits.value = await fetchLikedExhibits(userId);
+      likedExhibitsLoaded.value = true; // Mark as loaded
+      loadingExhibits.value = false;
+    } else if (newTab === 'created' && !createdExhibitsLoaded.value) {
+      loadingExhibits.value = true;
+      createdExhibits.value = await fetchCreatedExhibits(userId);
+      createdExhibitsLoaded.value = true; // Mark as loaded
+      loadingExhibits.value = false;
+    }
+  } else if (!newUser && oldUser) { // If user logs out
+    likedExhibits.value = [];
+    createdExhibits.value = [];
+    likedExhibitsLoaded.value = false;
+    createdExhibitsLoaded.value = false;
+  }
+}, { immediate: true });
 
 // 设置页面头部信息
 useHead(() => ({

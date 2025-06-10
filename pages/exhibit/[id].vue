@@ -34,10 +34,11 @@
                 <!-- <button @click="copyLink" class="hover:text-blue-500 transition">
                     <FontAwesomeIcon icon="fa-solid fa-link" />
                 </button> -->
-                <button @click="shareToFacebook" class="hover:text-blue-700 transition">
-                    <FontAwesomeIcon icon="fa-brands fa-facebook" />
+                <button v-if="canShare" @click="shareToXiaohongshu" class="hover:text-blue-700 transition">
+                    <FontAwesomeIcon icon="fa-solid fa-book" class="mr-2" />
+                    <!-- <img src="/xhs.svg" alt="Xiaohongshu Logo" class="w-6 h-6 inline-block" /> -->
                 </button>
-                <button @click="shareToTwitter" class="hover:text-black transition">
+                <button v-if="canShare" @click="shareToTwitter" class="hover:text-black transition">
                     <FontAwesomeIcon icon="fa-brands fa-x-twitter" />
                 </button>
                 <button @click="toggleShareMenu" class="hover:text-gray-700 transition relative">
@@ -49,14 +50,17 @@
                             class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                             复制链接
                         </a>
-                        <a href="#" @click.prevent="shareToFacebook"
-                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                            分享到Facebook
-                        </a>
-                        <a href="#" @click.prevent="shareToTwitter"
-                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                            分享到Twitter
-                        </a>
+
+                        <template v-if="exhibit.privacy !== 'private'">
+                            <a href="#" @click.prevent="shareToFacebook"
+                                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                分享到Facebook
+                            </a>
+                            <a href="#" @click.prevent="shareToTwitter"
+                                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                分享到Twitter
+                            </a>
+                        </template>
                         <!-- 可以添加更多分享选项 -->
                     </div>
                 </button>
@@ -150,6 +154,8 @@ import lgThumbnail from 'lightgallery/plugins/thumbnail';
 import 'lightgallery/css/lightgallery.css';
 import 'lightgallery/css/lg-zoom.css';
 import 'lightgallery/css/lg-thumbnail.css';
+import html2canvas from 'html2canvas';
+const { $auth } = useNuxtApp()
 
 const route = useRoute();
 const exhibitId = route.params.id;
@@ -161,12 +167,12 @@ const exhibit = ref({
 });
 
 useSeoMeta({
-  title: () => exhibit.value.title || '数字博物馆',
-  ogTitle: () => exhibit.value.title || '数字博物馆',
-  description: () => exhibit.value.description?.slice(0, 150) || '一个精彩的数字展览，欢迎来参观！',
-  ogDescription: () => exhibit.value.description?.slice(0, 150) || '一个精彩的数字展览，欢迎来参观！',
-  ogImage: () => exhibit.value.coverUrl || '/default-cover.jpg',
-  twitterCard: 'summary_large_image'
+    title: () => exhibit.value.title || '数字博物馆',
+    ogTitle: () => exhibit.value.title || '数字博物馆',
+    description: () => exhibit.value.description?.slice(0, 150) || '一个精彩的数字展览，欢迎来参观！',
+    ogDescription: () => exhibit.value.description?.slice(0, 150) || '一个精彩的数字展览，欢迎来参观！',
+    ogImage: () => exhibit.value.coverUrl || '/default-cover.jpg',
+    twitterCard: 'summary_large_image'
 })
 
 const showFullDescription = ref(false);
@@ -184,6 +190,10 @@ const isShareMenuOpen = ref(false);
 
 // 新增：显示模式
 const displayMode = ref('list'); // 'list' 为参观模式，'grid' 为快速浏览模式
+
+const canShare = computed(() => {
+    return exhibit.value.privacy !== 'private' && $auth.isLoggedIn.value && $auth.user.value?.id === exhibit.value.author;
+});
 
 // 新增：动态背景图样式
 const dynamicCoverStyle = computed(() => {
@@ -225,6 +235,81 @@ const dynamicCoverStyle = computed(() => {
     };
 });
 
+const shareToXiaohongshu = async () => {
+    if (!exhibit.value) return;
+
+    const shareContent = document.createElement('div');
+    shareContent.style.width = '750px'; // 小红书推荐图片宽度
+    shareContent.style.height = '1334px'; // 小红书推荐图片高度
+    shareContent.style.backgroundColor = '#f8f8f8';
+    shareContent.style.display = 'flex';
+    shareContent.style.flexDirection = 'column';
+    shareContent.style.alignItems = 'center';
+    shareContent.style.justifyContent = 'center';
+    shareContent.style.padding = '40px';
+    shareContent.style.boxSizing = 'border-box';
+    shareContent.style.position = 'absolute'; // 隐藏在屏幕外
+    shareContent.style.left = '-9999px';
+    shareContent.style.top = '-9999px';
+
+    // 添加封面图片
+    if (exhibit.value.coverUrl) {
+        const img = document.createElement('img');
+        img.src = exhibit.value.coverUrl;
+        img.style.width = '600px';
+        img.style.height = 'auto';
+        img.style.objectFit = 'contain';
+        img.style.marginBottom = '20px';
+        shareContent.appendChild(img);
+    }
+
+    // 添加标题
+    const title = document.createElement('h1');
+    title.textContent = exhibit.value.title;
+    title.style.fontSize = '48px';
+    title.style.fontWeight = 'bold';
+    title.style.textAlign = 'center';
+    title.style.marginBottom = '20px';
+    title.style.color = '#333';
+    shareContent.appendChild(title);
+
+    // 添加描述
+    const description = document.createElement('p');
+    description.textContent = exhibit.value.description;
+    description.style.fontSize = '32px';
+    description.style.textAlign = 'left';
+    description.style.color = '#666';
+    description.style.lineHeight = '1.5';
+    shareContent.appendChild(description);
+
+    document.body.appendChild(shareContent);
+
+    try {
+        const canvas = await html2canvas(shareContent, {
+            useCORS: true, // 如果图片是跨域的，需要设置此项
+            allowTaint: true, // 允许污染画布，如果图片是跨域的，可能需要
+            backgroundColor: '#f8f8f8', // 设置背景色，防止透明
+        });
+        const image = canvas.toDataURL('image/png');
+
+        // 提供下载
+        const link = document.createElement('a');
+        link.href = image;
+        link.download = `PersonalMuseum_${exhibit.value.title}.png`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        alert('图片已生成并下载。请手动打开小红书，选择此图片进行分享！');
+    } catch (error) {
+        console.error('生成图片失败:', error);
+        alert('生成分享图片失败，请稍后再试。');
+    } finally {
+        document.body.removeChild(shareContent);
+    }
+};
+
+
 const fetchExhibitData = async (id, append = false) => {
     try {
         isLoading.value = true;
@@ -237,8 +322,11 @@ const fetchExhibitData = async (id, append = false) => {
 
         if (data.value?.exhibit) {
             if (!append) {
+                console.log(data.value, '23423423')
+                exhibit.value.author = data.value.exhibit.author;
+                exhibit.value.privacy = data.value.exhibit.privacy;
                 exhibit.value.title = data.value.exhibit.title;
-                exhibit.value.cover = data.value.exhibit.cover;
+                exhibit.value.coverUrl = data.value.exhibit.coverUrl;
                 exhibit.value.description = data.value.exhibit.description;
                 exhibit.value.datas = []; // 重置数据以便首次加载或非追加模式
                 shouldShowToggle.value = data.value.exhibit.description?.length > 150;
@@ -277,8 +365,8 @@ const fetchExhibitData = async (id, append = false) => {
     }
 };
 
-onMounted(() => {
-    fetchExhibitData(exhibitId);
+onMounted(async () => {
+    await fetchExhibitData(exhibitId);
     window.addEventListener('scroll', handleScroll);
 });
 
@@ -352,15 +440,36 @@ const shareUrl = computed(() => {
 });
 
 // 复制链接
-const copyLink = () => {
-    navigator.clipboard.writeText(shareUrl.value)
-        .then(() => {
-            alert('链接已复制到剪贴板');
-        })
-        .catch(err => {
-            console.error('复制链接失败:', err);
-            alert('复制链接失败，请手动复制');
-        });
+const copyLink = async () => {
+    try {
+        let shareUrl = window.location.href;
+        if (exhibit.value.privacy === 'private') {
+            if (!$auth.user.value || $auth.user.value.id !== exhibit.value.author) {
+                alert('只有项目作者可以分享私有项目');
+                return;
+            }
+            const { data, error } = await useFetch(`/api/share`, { // Endpoint remains /api/share
+                method: 'POST', // IMPORTANT: Specify POST method
+                body: { // Send data in the request body
+                    exhibit_id: exhibitId,
+                    user: $auth.user.value.id // Use user_id for clarity
+                },
+                key: `generated-invite-link-${exhibitId}-${$auth.user.value.id}`, // Unique key for useFetch caching
+            });
+            if (error.value || !data.value?.shareLink) {
+                console.error('获取分享链接失败:', error.value);
+                alert('获取分享链接失败，请稍后再试');
+                return;
+            }
+            shareUrl = data.value.shareLink;
+        }
+        await navigator.clipboard.writeText(shareUrl);
+        alert('分享链接已复制到剪贴板');
+    } catch (err) {
+        console.error('复制分享链接失败:', err);
+        alert('复制分享链接失败，请手动复制');
+    }
+    isShareMenuOpen.value = false;
 };
 
 // 社交媒体分享

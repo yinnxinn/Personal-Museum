@@ -7,6 +7,7 @@ export default defineNuxtConfig({
   modules: [
     '@nuxtjs/i18n', // 添加 i18n 模块
     '@nuxtjs/supabase',
+    '@pinia/nuxt',
   ],
   compatibilityDate: '2025-05-15',
   devtools: { enabled: true },
