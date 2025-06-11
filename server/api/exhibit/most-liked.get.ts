@@ -2,12 +2,16 @@ import { supabase } from '../../utils/supabase';
 import { H3Event, getQuery, createError } from 'h3';
 
 export default defineEventHandler(async (event: H3Event) => {
+
+
+  const supabaseClient = supabase(event);
+
   const query = getQuery(event);
 
   const limit = parseInt((query.limit as string) || '4', 10);
 
   try {
-    const { data, error } = await supabase.rpc('get_most_liked_exhibits', {
+    const { data, error } = await supabaseClient.rpc('get_most_liked_exhibits', {
       p_limit: limit,
     });
 

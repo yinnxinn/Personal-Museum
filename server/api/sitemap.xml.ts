@@ -2,11 +2,14 @@ import { supabase } from '../utils/supabase';
 import { defineEventHandler } from 'h3';
 
 export default defineEventHandler(async (event) => {
+
+const supabaseClient = supabase(event);
+
   // 设置响应头为XML
   event.node.res.setHeader('Content-Type', 'application/xml');
   
   // 获取所有公开的展览
-  const { data: exhibits, error } = await supabase
+  const { data: exhibits, error } = await supabaseClient
     .from('exhibits')
     .select('id')
     .eq('privacy', 'public');

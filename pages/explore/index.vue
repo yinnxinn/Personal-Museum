@@ -79,7 +79,7 @@ const router = useRouter(); // Initialize router for navigation
 
 const totalExhibits = ref(0);
 const currentPage = ref(1);
-const pageSize = ref(5);
+const pageSize = ref(12);
 const searchQuery = ref('');
 const allExhibits = ref([]); // Holds all fetched exhibits
 const recommendedExhibits = ref([]); // Holds recommended exhibits (subset of allExhibits) // Holds exhibits filtered by search query
@@ -128,9 +128,6 @@ const fetchRecommendedExhibits = async () => {
       headers: useRequestHeaders(['cookie', 'authorization']),
       credentials: 'include'
     }) // 若服务端基于 cookie 做鉴权);
-
-    console.log('Fetching recommended exhibits...', data.value); // Log the start of the fetch
-    console.log('Fetching recommended exhibits2222...', data.value.exhibits); // Log the start of the fetch
 
     if (data.value) {
       console.log('Recommended exhibits:', data.value.exhibits); // Log the fetched recommendatio

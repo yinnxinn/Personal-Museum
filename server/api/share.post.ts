@@ -3,6 +3,8 @@ import { H3Event, createError } from 'h3';
 import { v4 as uuidv4 } from 'uuid'; // 用于生成唯一的分享 token
 
 export default defineEventHandler(async (event) => {
+
+    const supabaseClient = supabase(event);
  
     const body = await readBody(event);
     const { exhibit_id, user } = body;
@@ -23,7 +25,7 @@ export default defineEventHandler(async (event) => {
     }
 
     // 1. 验证当前用户是否是展品的创建者
-    const { data: exhibitData, error: exhibitError } = await supabase
+    const { data: exhibitData, error: exhibitError } = await supabaseClient
         .from('exhibits')
         .select('author, privacy')
         .eq('id', exhibit_id)
@@ -58,7 +60,7 @@ export default defineEventHandler(async (event) => {
     const expiresAt = new Date(createdAt.getTime() + 24 * 60 * 60 * 1000);
 
     // 4. 将分享链接信息插入到 share_links 表
-    const { error: insertError } = await supabase
+    const { error: insertError } = await supabaseClient
         .from('share_links')
         .insert({
             exhibitId: exhibit_id,

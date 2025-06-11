@@ -5,10 +5,13 @@ import { TIME_PERIODS } from '../../../utils/constants'; // Ensure this path is 
 
 
 export default defineEventHandler(async (event: H3Event) => {
+
+
+  const supabaseClient = supabase(event);
+
+  
   try {
     const periodId = event.context.params?.periodId;
-
-    console.log('Fetching exhibits for period:', periodId);
 
     if (!periodId) {
       throw createError({
@@ -26,10 +29,11 @@ export default defineEventHandler(async (event: H3Event) => {
       });
     }
 
-    console.log('Period details:', period);
+    // Initialize Supabase client
+    console.log( 'period ', period)
 
     // Directly query the 'exhibits' table
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
       .from('exhibits')
       .select(`
         id,
@@ -42,7 +46,7 @@ export default defineEventHandler(async (event: H3Event) => {
       .gte('created_at', period.start.toISOString()) // Greater than or equal to start date
       .lte('created_at', period.end.toISOString())   // Less than or equal to end date
       .order('created_at', { ascending: false })     // Order by newest first
-      .limit(10);                                    // Limit to 10 exhibits
+      .limit(3);                                    // Limit to 10 exhibits
 
     if (error) {
       console.error(`Supabase query error for period ${periodId}:`, error);

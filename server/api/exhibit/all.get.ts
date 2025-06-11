@@ -12,9 +12,12 @@ export default defineEventHandler(async (event: H3Event) => {
   const from = (page-1) * pageSize;
   const to = from + pageSize - 1;
 
+
+  const supabaseClient = supabase(event);
+
   try {
     // 构建基本查询
-    let queryBuilder = supabase
+    let queryBuilder = supabaseClient
       .from('exhibits')
       .select('id, title, description, coverUrl, created_at, author', 
         { count: 'exact' }

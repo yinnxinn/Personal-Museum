@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from 'uuid'; // You'll need to install uuid: pnpm instal
 export default defineEventHandler(async (event: H3Event) => {
   const formData = await readMultipartFormData(event);
 
-  console.log(' upload-image.post.ts')
+  const supabaseClient = supabase(event);
 
   if (!formData || formData.length === 0) {
     throw createError({
@@ -23,7 +23,7 @@ export default defineEventHandler(async (event: H3Event) => {
       const fileName = `${uuidv4()}-${fileField.filename}`;
       const contentType = fileField.type || 'application/octet-stream';
 
-      const { data, error } = await supabase.storage
+      const { data, error } = await supabaseClient.storage
         .from('images') // Make sure this bucket exists in Supabase
         .upload(`public/${fileName}`, fileBuffer, {
           contentType: contentType,
@@ -39,7 +39,7 @@ export default defineEventHandler(async (event: H3Event) => {
       }
 
       // Get the public URL of the uploaded image
-      const { data: publicUrlData } = supabase.storage
+      const { data: publicUrlData } = supabaseClient.storage
         .from('images')
         .getPublicUrl(data.path);
 

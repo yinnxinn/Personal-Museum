@@ -80,5 +80,9 @@
     "tech_deployment": "部署",
     "section_vision_title": "我们的愿景",
     "section_vision_desc": "我们相信，每一份热爱都值得被记录与分享。“个人博物馆”项目致力于成为全球收藏爱好者首选的数字化管理和展示平台，让您的收藏不仅仅是物品，更是连接世界、传递文化的桥梁。我们期待与您一同，开启数字策展的新篇章。"
-  }
-}
+  },
+  "Past Day":"过去一天",
+  "Past Week":"过去一周",
+  "Past Month":"过去一月",
+  "Over Half Year Ago":"半年前"
+} 

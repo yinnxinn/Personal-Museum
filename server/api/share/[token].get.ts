@@ -2,6 +2,9 @@ import { supabase } from '../../utils/supabase';
 import { H3Event, createError } from 'h3';
 
 export default defineEventHandler(async (event) => {
+
+    const supabaseClient = supabase(event);
+
     const token = getRouterParam(event, 'token');
     const query = getQuery(event);
 
@@ -15,7 +18,7 @@ export default defineEventHandler(async (event) => {
     }
 
     // 1. 查询 share_links 表
-    const { data: shareData, error: shareError } = await supabase
+    const { data: shareData, error: shareError } = await supabaseClient
         .from('share_links')
         .select('exhibitId, expires_at')
         .eq('token', token)
@@ -41,7 +44,7 @@ export default defineEventHandler(async (event) => {
     // 3. 可选：记录用户权限到 exhibit_permissions 表
     const user = query.userId;
     if (user) {
-        const { error: permError } = await supabase
+        const { error: permError } = await supabaseClient
             .from('exhibit_permissions')
             .insert({
                 exhibitId: shareData.exhibitId,

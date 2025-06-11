@@ -5,6 +5,8 @@ import { H3Event, readBody, createError } from 'h3';
 export default defineEventHandler(async (event: H3Event) => {
   const body = await readBody(event);
 
+  const supabaseClient = supabase(event);
+
 
   const { title, description, privacy, items, coverUrl, author } = body;
 
@@ -17,7 +19,7 @@ export default defineEventHandler(async (event: H3Event) => {
 
   try {
     // 1. Insert the new exhibit
-    const { data: newExhibit, error: exhibitError } = await supabase
+    const { data: newExhibit, error: exhibitError } = await supabaseClient
       .from('exhibits')
       .insert({
         title,
@@ -40,7 +42,7 @@ export default defineEventHandler(async (event: H3Event) => {
     }
 
     //1.5 insert perssmission 
-    const { data: idx, error: error } = await supabase
+    const { data: idx, error: error } = await supabaseClient
       .from('exhibit_permissions')
       .insert({
         userId: author,
@@ -71,7 +73,7 @@ export default defineEventHandler(async (event: H3Event) => {
     }));
 
     if (exhibitItemsToInsert.length > 0) {
-      const { error: itemsError } = await supabase
+      const { error: itemsError } = await supabaseClient
         .from('images')
         .insert(exhibitItemsToInsert);
 

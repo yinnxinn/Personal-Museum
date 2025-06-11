@@ -2,6 +2,10 @@ import { supabase } from '../../utils/supabase';
 import { H3Event, getRouterParam, getQuery, createError } from 'h3';
 
 export default defineEventHandler(async (event: H3Event) => {
+
+
+  const supabaseClient = supabase(event);
+
   const id = getRouterParam(event, 'id');
   const query = getQuery(event);
 
@@ -20,7 +24,7 @@ export default defineEventHandler(async (event: H3Event) => {
 
   try {
     // 先查一次该展品是否存在（避免空数据导致无法提取title等）
-    const { data: headData, error: headError } = await supabase
+    const { data: headData, error: headError } = await supabaseClient
       .from('exhibits')
       .select('id, title, description, coverUrl, created_at, author, privacy')
       .eq('id', id)
@@ -42,7 +46,7 @@ export default defineEventHandler(async (event: H3Event) => {
     }
 
     // 分页获取展品的图片项
-    const { data: items, error: listError, count } = await supabase
+    const { data: items, error: listError, count } = await supabaseClient
       .from('images')
       .select('id, title, description, image_url, author', { count: 'exact' })
       .eq('exhibitId', id)
@@ -57,6 +61,7 @@ export default defineEventHandler(async (event: H3Event) => {
       });
     }
 
+
     const exhibitInfo = headData[0];
 
     return {
@@ -64,7 +69,7 @@ export default defineEventHandler(async (event: H3Event) => {
         id,
         title: exhibitInfo.title,
         description: exhibitInfo.description,
-        cover: exhibitInfo.image_url,
+        coverUrl: exhibitInfo.coverUrl,
         createdAt: exhibitInfo.created_at,
         author: exhibitInfo.author,
         privacy: exhibitInfo.privacy,
@@ -74,7 +79,7 @@ export default defineEventHandler(async (event: H3Event) => {
           description: item.description,
           imageUrl: item.image_url,
           author: item.author
-          
+
         })) || [],
       },
       pagination: {

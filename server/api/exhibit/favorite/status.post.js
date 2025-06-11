@@ -1,12 +1,11 @@
 // 获取收藏状态
-import { serverSupabaseClient } from '#supabase/server'
+import { supabase } from '../../../utils/supabase';
 
 export default defineEventHandler(async (event) => {
-  const client = await serverSupabaseClient(event)
-  const { id } = event.context.params
-  
-  // 获取当前用户
-  const { data: { user } } = await client.auth.getUser()
+
+  const { id, user } = await readBody(event)
+
+  const supabaseClient = supabase(event);
   
   if (!user) {
     // 未登录用户默认未收藏
@@ -15,10 +14,10 @@ export default defineEventHandler(async (event) => {
   
   try {
     // 查询是否已收藏
-    const { data, error } = await client
+    const { data, error } = await supabaseClient
       .from('actions')
       .select('id')
-      .match({ userId: user.id, exhibitId: id })
+      .match({ userId: user, exhibitId: id })
       .single()
     
     if (error && error.code !== 'PGRST116') { // PGRST116 是未找到记录的错误

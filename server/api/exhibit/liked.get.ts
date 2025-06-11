@@ -3,6 +3,10 @@ import { supabase } from '../../utils/supabase';
 import { H3Event, getQuery, createError } from 'h3';
 
 export default defineEventHandler(async (event: H3Event) => {
+
+
+    const supabaseClient = supabase(event);
+
   const query = getQuery(event);
   const userId = query.userId as string; // Expect userId as a query parameter
 
@@ -15,11 +19,13 @@ export default defineEventHandler(async (event: H3Event) => {
 
   try {
     // 1. Get exhibit IDs that the user has liked from the 'actions' table
-    const { data: likedActions, error: actionsError } = await supabase
+    const { data: likedActions, error: actionsError } = await supabaseClient
       .from('actions')
       .select('exhibitId')
       .eq('userId', userId)
       .eq('likes', true); // Filter for actions where 'likes' is true
+
+    console.log('Liked actions:', likedActions);
 
     if (actionsError) {
       console.error('Supabase actions fetch error:', actionsError);
@@ -37,7 +43,7 @@ export default defineEventHandler(async (event: H3Event) => {
     }
 
     // 2. Fetch the exhibit details for the liked IDs from the 'exhibits' table
-    const { data: exhibitsData, error: exhibitsError, count } = await supabase
+    const { data: exhibitsData, error: exhibitsError, count } = await supabaseClient
       .from('exhibits')
       .select('id, title, description, coverUrl, created_at, author', { count: 'exact' })
       .in('id', exhibitIds) // Filter exhibits by the collected IDs
@@ -50,6 +56,8 @@ export default defineEventHandler(async (event: H3Event) => {
         statusMessage: 'Failed to fetch liked exhibit details.',
       });
     }
+
+    console.log('Exhibits data:', exhibitsData);
 
     // Format the response data
     const exhibits = exhibitsData?.map(exhibit => ({

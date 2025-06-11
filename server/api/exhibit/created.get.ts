@@ -3,6 +3,11 @@ import { supabase } from '../../utils/supabase';
 import { H3Event, getQuery, createError } from 'h3';
 
 export default defineEventHandler(async (event: H3Event) => {
+
+
+    const supabaseClient = supabase(event);
+
+
   const query = getQuery(event);
   const userId = query.userId as string; // Expect userId as a query parameter
 
@@ -22,7 +27,7 @@ export default defineEventHandler(async (event: H3Event) => {
     // Perform a JOIN between exhibits and exhibit_permissions
     // We select exhibits where the current user is a collaborator (which now includes owners)
     // AND the role grants management/editing access.
-    const { data, error, count } = await supabase
+    const { data, error, count } = await supabaseClient
       .from('exhibits')
       .select(`
         id,

@@ -3,6 +3,9 @@ import { supabase } from '../../utils/supabase';
 import { H3Event, readBody, createError } from 'h3';
 
 export default defineEventHandler(async (event: H3Event) => {
+
+  const supabaseClient = supabase(event);
+
   const body = await readBody(event);
   const { id, title, description, privacy, items } = body;
 
@@ -15,7 +18,7 @@ export default defineEventHandler(async (event: H3Event) => {
 
   try {
     // 1. Update the exhibit details
-    const { error: exhibitError } = await supabase
+    const { error: exhibitError } = await supabaseClient
       .from('exhibits')
       .update({
         title,
@@ -35,7 +38,7 @@ export default defineEventHandler(async (event: H3Event) => {
 
     // 2. Handle exhibit items (upsert or delete as needed)
     // First, get existing items to compare
-    const { data: existingItems, error: fetchItemsError } = await supabase
+    const { data: existingItems, error: fetchItemsError } = await supabaseClient
       .from('images')
       .select('id')
       .eq('exhibitId', id);
@@ -57,7 +60,7 @@ export default defineEventHandler(async (event: H3Event) => {
 
     // Delete removed items
     if (itemsToDelete.length > 0) {
-      const { error: deleteError } = await supabase
+      const { error: deleteError } = await supabaseClient
         .from('images')
         .delete()
         .in('id', itemsToDelete);
@@ -80,8 +83,7 @@ export default defineEventHandler(async (event: H3Event) => {
         description: item.description,
       }));
 
-      console.log( formattedNewItems , '11111111')
-      const { error: insertError } = await supabase
+      const { error: insertError } = await supabaseClient
         .from('images')
         .insert(formattedNewItems);
 
@@ -96,7 +98,7 @@ export default defineEventHandler(async (event: H3Event) => {
 
     // Update existing items' titles and descriptions
     for (const item of itemsToUpdate) {
-      const { error: updateItemError } = await supabase
+      const { error: updateItemError } = await supabaseClient
         .from('images')
         .update({
           title: item.title,

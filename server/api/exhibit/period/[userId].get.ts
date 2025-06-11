@@ -5,6 +5,10 @@ import {TIME_PERIODS}  from '../../../utils/constants';
 
 
 export default defineEventHandler(async (event: H3Event) => {
+
+
+  const supabaseClient = supabase(event);
+
   try {
     const periodId = event.context.params?.periodId;
     const userId = event.context.params?.userId;
@@ -25,7 +29,7 @@ export default defineEventHandler(async (event: H3Event) => {
       });
     }
 
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
       .from('exhibits')
       .select(`
         id,

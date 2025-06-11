@@ -3,11 +3,16 @@ import { supabase } from '../../utils/supabase';
 import { H3Event, createError } from 'h3';
 
 export default defineEventHandler(async (event: H3Event) => {
+
+
+  const supabaseClient = supabase(event);
+
   try {
     // 获取3个最新创建的展品作为推荐
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
       .from('exhibits')
       .select('id, title, description, coverUrl, created_at, author')
+      .eq('privacy', 'public')
       .order('created_at', { ascending: false })
       .limit(3);
 
