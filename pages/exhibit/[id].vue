@@ -4,6 +4,8 @@
             :style="dynamicCoverStyle">
         </div>
 
+        {{$auth}}
+
         <div class="text-center px-4 py-6 mb-6">
             <div class="flex justify-center items-center space-x-4 mb-4">
                 <button @click="displayMode = 'list'"
@@ -575,8 +577,9 @@ const handleScroll = throttle(() => {
     }
 }, 300);
 
-onMounted(() => {
+onMounted(async () => {
     window.addEventListener('scroll', handleScroll);
+    await fetchExhibitDetails();
 });
 
 onUnmounted(() => {
