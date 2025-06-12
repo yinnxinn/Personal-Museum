@@ -34,7 +34,7 @@
                 <!-- <button @click="copyLink" class="hover:text-blue-500 transition">
                     <FontAwesomeIcon icon="fa-solid fa-link" />
                 </button> -->
-                <button v-if="canShare" @click="shareToXiaohongshu" class="hover:text-blue-700 transition">
+                <button v-if="canShare" @click="generateShareImage(exhibit)" class="hover:text-blue-700 transition">
                     <FontAwesomeIcon icon="fa-solid fa-book" class="mr-2" />
                     <!-- <img src="/xhs.svg" alt="Xiaohongshu Logo" class="w-6 h-6 inline-block" /> -->
                 </button>
@@ -106,7 +106,7 @@
                                     class="w-full h-full object-cover cursor-pointer"
                                     :class="{ 'aspect-video': displayMode === 'grid' }" @load="item.loaded = true" />
                             </a>
-                            <button @click.stop="downloadImage(item)"
+                            <button @click.stop="generateShareImage(item)"
                                 class="absolute top-2 right-2 bg-gray-100 bg-opacity-75 rounded-md p-2 text-gray-600 hover:text-gray-800 transition z-10">
                                 <FontAwesomeIcon icon="fa-solid fa-download" class="text-sm" />
                             </button>
@@ -415,66 +415,7 @@ const dynamicCoverStyle = computed(() => {
     };
 });
 
-// --- downloadImage 方法：生成并显示图片浮层 ---
-const downloadImage = async (item) => {
-    const tempShareContent = document.createElement('div');
-    tempShareContent.style.width = '750px'; // 小红书推荐尺寸宽度
-    tempShareContent.style.backgroundColor = '#f8f8f8';
-    tempShareContent.style.display = 'flex';
-    tempShareContent.style.flexDirection = 'column';
-    tempShareContent.style.alignItems = 'center';
-    tempShareContent.style.padding = '40px';
-    tempShareContent.style.boxSizing = 'border-box';
-    tempShareContent.style.position = 'absolute'; // 隐藏在屏幕外，用于渲染
-    tempShareContent.style.left = '-9999px';
-    tempShareContent.style.top = '-9999px';
-    tempShareContent.style.borderRadius = '8px';
-    tempShareContent.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.2)';
 
-    const img = document.createElement('img');
-    img.src = item.imageUrl;
-    img.style.width = '600px'; // 图片在卡片内的最大宽度
-    img.style.height = 'auto';
-    img.style.objectFit = 'contain';
-    img.style.marginBottom = '20px';
-    tempShareContent.appendChild(img);
-
-    const title = document.createElement('h3');
-    title.textContent = item.title;
-    title.style.fontSize = '36px'; // 适当的字体大小
-    title.style.fontWeight = 'bold';
-    title.style.textAlign = 'center';
-    title.style.marginBottom = '10px';
-    title.style.color = '#333';
-    tempShareContent.appendChild(title);
-
-    if (item.description) {
-        const description = document.createElement('p');
-        description.textContent = item.description;
-        description.style.fontSize = '24px';
-        description.style.textAlign = 'left';
-        description.style.color = '#f8f8f8';
-        description.style.lineHeight = '1.4';
-        tempShareContent.appendChild(description);
-    }
-
-    document.body.appendChild(tempShareContent);
-
-    try {
-        const canvas = await html2canvas(tempShareContent, {
-            useCORS: true,
-            allowTaint: true,
-            backgroundColor: '#f8f8f8',
-        });
-        downloadImageUrl.value = canvas.toDataURL('image/png');
-        isDownloadOverlayVisible.value = true; // 显示浮层
-    } catch (error) {
-        console.error('生成图片失败:', error);
-        alert('生成下载图片失败，请稍后再试。');
-    } finally {
-        document.body.removeChild(tempShareContent); // 移除临时创建的DOM元素
-    }
-};
 
 const closeDownloadOverlay = () => {
     isDownloadOverlayVisible.value = false;
@@ -484,74 +425,127 @@ const closeDownloadOverlay = () => {
 // Existing functions below...
 const isShareOverlayVisible = ref(false); // Controls visibility of the share image overlay
 const shareOverlayImageUrl = ref('');
-const shareToXiaohongshu = async () => {
-    if (!exhibit.value || !exhibit.value.title) return;
 
-    const shareContent = document.createElement('div');
-    shareContent.style.width = '750px';
-    shareContent.style.height = '1334px'; // Xiaohongshu recommended aspect ratio
-    shareContent.style.backgroundColor = '#f8f8f8';
-    shareContent.style.display = 'flex';
-    shareContent.style.flexDirection = 'column';
-    shareContent.style.alignItems = 'center';
-    shareContent.style.justifyContent = 'center';
-    shareContent.style.padding = '40px';
-    shareContent.style.boxSizing = 'border-box';
-    shareContent.style.position = 'absolute';
-    shareContent.style.left = '-9999px'; // Render off-screen for html2canvas
-    shareContent.style.top = '-9999px';
 
-    if (exhibit.value.coverUrl) {
+const generateShareImage = async (item, mode = 'share') => {
+    if (!item || !item.title) return;
+
+    const container = document.createElement('div');
+    container.style.width = '750px';
+    container.style.backgroundColor = '#f9f7f5'; // 柔和的米白色背景
+    container.style.display = 'flex';
+    container.style.flexDirection = 'column';
+    container.style.alignItems = 'center';
+    container.style.justifyContent = 'flex-start';
+    container.style.padding = '50px'; // 增加内边距
+    container.style.boxSizing = 'border-box';
+    container.style.position = 'absolute';
+    container.style.left = '-9999px';
+    container.style.top = '-9999px';
+    container.style.borderRadius = '12px'; // 更大的圆角
+    container.style.boxShadow = '0 8px 24px rgba(0, 0, 0, 0.08)'; // 更柔和的阴影
+    container.style.fontFamily = '"Helvetica Neue", Arial, sans-serif'; // 优雅的字体
+
+    // 添加艺术装饰元素
+    const artDecoTop = document.createElement('div');
+    artDecoTop.style.width = '100%';
+    artDecoTop.style.height = '4px';
+    artDecoTop.style.backgroundColor = '#d4b996'; // 金色装饰线
+    artDecoTop.style.marginBottom = '30px';
+    artDecoTop.style.borderRadius = '2px';
+    container.appendChild(artDecoTop);
+
+    if (item.imageUrl || item.coverUrl) {
+        const imgContainer = document.createElement('div');
+        imgContainer.style.width = '100%';
+        imgContainer.style.marginBottom = '30px';
+        imgContainer.style.borderRadius = '8px';
+        imgContainer.style.overflow = 'hidden';
+        imgContainer.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.05)';
+        
         const img = document.createElement('img');
-        img.src = exhibit.value.coverUrl;
-        img.style.width = '600px';
+        img.src = item.imageUrl || item.coverUrl;
+        img.style.width = '100%';
         img.style.height = 'auto';
-        img.style.objectFit = 'contain';
-        img.style.marginBottom = '20px';
-        shareContent.appendChild(img);
+        img.style.display = 'block';
+        img.style.objectFit = 'cover';
+        
+        imgContainer.appendChild(img);
+        container.appendChild(imgContainer);
     }
 
-    const title = document.createElement('h1');
-    title.textContent = exhibit.value.title;
-    title.style.fontSize = '48px';
-    title.style.fontWeight = 'bold';
-    title.style.textAlign = 'center';
-    title.style.marginBottom = '20px';
-    title.style.color = '#333';
-    shareContent.appendChild(title);
+    // 标题容器添加背景和边框
+    const titleContainer = document.createElement('div');
+    titleContainer.style.width = '100%';
+    titleContainer.style.padding = '20px';
+    titleContainer.style.backgroundColor = '#ffffff'; // 纯白背景
+    titleContainer.style.borderRadius = '8px';
+    titleContainer.style.marginBottom = '25px';
+    titleContainer.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.03)';
+    titleContainer.style.borderLeft = '4px solid #d4b996'; // 金色装饰条
 
-    const description = document.createElement('p');
-    description.textContent = exhibit.value.description;
-    description.style.fontSize = '32px';
-    description.style.textAlign = 'left';
-    description.style.color = '#666';
-    description.style.lineHeight = '1.5';
-    // Add some basic styling for description overflow if it's too long
-    description.style.maxHeight = '300px'; // Limit description height
-    description.style.overflowY = 'auto'; // Add scroll if content overflows
-    shareContent.appendChild(description);
+    const title = document.createElement(item.titleFontTag || 'h2');
+    title.textContent = item.title;
+    title.style.fontSize = mode === 'share' ? '42px' : '36px';
+    title.style.fontWeight = '600'; // 中等粗体
+    title.style.textAlign = 'left';
+    title.style.margin = '0';
+    title.style.color = '#3a3a3a'; // 深灰替代纯黑
+    title.style.lineHeight = '1.3';
+    title.style.letterSpacing = '-0.5px'; // 紧凑字距
+    titleContainer.appendChild(title);
+    container.appendChild(titleContainer);
 
-    document.body.appendChild(shareContent);
+    if (item.description) {
+        const description = document.createElement('div');
+        description.textContent = item.description;
+        description.style.fontSize = mode === 'share' ? '30px' : '24px';
+        description.style.textAlign = 'left';
+        description.style.color = '#5c5c5c'; // 中灰色
+        description.style.lineHeight = '1.6';
+        description.style.whiteSpace = 'pre-wrap';
+        description.style.padding = '0 10px';
+        description.style.fontFamily = '"Georgia", serif'; // 优雅衬线字体
+        container.appendChild(description);
+    }
+
+    // 添加底部水印
+    const watermark = document.createElement('div');
+    watermark.style.width = '100%';
+    watermark.style.textAlign = 'center';
+    watermark.style.marginTop = '30px';
+    watermark.style.paddingTop = '20px';
+    watermark.style.borderTop = '1px solid #eae6e0'; // 柔和的边框
+    watermark.style.color = '#a0a0a0'; // 浅灰色
+    watermark.style.fontSize = '24px';
+    watermark.textContent = 'Personal Museum · 数字艺术收藏';
+    container.appendChild(watermark);
+
+    document.body.appendChild(container);
 
     try {
-        const canvas = await html2canvas(shareContent, {
+        const canvas = await html2canvas(container, {
             useCORS: true,
             allowTaint: true,
-            backgroundColor: '#f8f8f8',
+            backgroundColor: '#f9f7f5',
+            scale: 2 // 更高分辨率
         });
-        const image = canvas.toDataURL('image/png');
 
-        // --- MODIFIED PART ---
-        shareOverlayImageUrl.value = image;
-        isShareOverlayVisible.value = true;
-        // alert('图片已生成。请右键或长按保存图片，并手动打开小红书进行分享！'); // Optional alert
-        // --- END MODIFIED PART ---
+        const imageDataUrl = canvas.toDataURL('image/png');
+
+        if (mode === 'share') {
+            shareOverlayImageUrl.value = imageDataUrl;
+            isShareOverlayVisible.value = true;
+        } else if (mode === 'download') {
+            downloadImageUrl.value = imageDataUrl;
+            isDownloadOverlayVisible.value = true;
+        }
 
     } catch (error) {
         console.error('生成图片失败:', error);
-        alert('生成分享图片失败，请稍后再试。');
+        alert('生成图片失败，请稍后再试。');
     } finally {
-        document.body.removeChild(shareContent);
+        document.body.removeChild(container);
     }
 };
 

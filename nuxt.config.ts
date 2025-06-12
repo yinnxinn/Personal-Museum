@@ -3,7 +3,7 @@ import path from 'path';
 
 // 在现有配置中添加
 export default defineNuxtConfig({
-  ssr: true,
+  ssr: false,
   modules: [
     '@nuxtjs/i18n', // 添加 i18n 模块
     '@nuxtjs/supabase',
@@ -37,7 +37,7 @@ export default defineNuxtConfig({
     ],
     lazy: true,
     langDir: path.resolve(__dirname, './lang'), // 语言文件存放目录
-    defaultLocale: 'zh', // 默认语言
+    defaultLocale: 'en', // 默认语言
     strategy: 'prefix_except_default', // 路由策略，除默认语言外，其他语言带前缀
     vueI18n: './i18n.config.ts' // Vue I18n 配置文件的路径
   },
@@ -54,7 +54,11 @@ export default defineNuxtConfig({
         '/explore',                // about.vue
         '/en/explore',                // about.vue
         '/exhibit/*',
-        '/en/exhibit/*'
+        '/en/exhibit/*',
+        '/en/search',
+        '/search',
+        '/search/*',
+        '/en/search/*',
       ]
     },
   },

@@ -9,7 +9,7 @@ export default defineEventHandler(async (event: H3Event) => {
   const category = (query.category as string) || '';
   const search = (query.search as string) || '';
 
-  const from = (page-1) * pageSize;
+  const from = (page - 1) * pageSize;
   const to = from + pageSize - 1;
 
 
@@ -19,11 +19,10 @@ export default defineEventHandler(async (event: H3Event) => {
     // 构建基本查询
     let queryBuilder = supabaseClient
       .from('exhibits')
-      .select('id, title, description, coverUrl, created_at, author', 
+      .select('id, title, description, coverUrl, created_at, author',
         { count: 'exact' }
       ).eq('privacy', 'public')
-      .order('created_at', { ascending: false })
-      .range(from, to);
+
 
     // 添加分类过滤
     if (category) {
@@ -32,16 +31,32 @@ export default defineEventHandler(async (event: H3Event) => {
 
     // 添加搜索过滤
     if (search) {
-      queryBuilder = queryBuilder.ilike('title', `%${search}%`);
+      queryBuilder = queryBuilder.ilike('title', `%${search}%`).range(from, to);
+    } else {
+      queryBuilder = queryBuilder.order('description', { ascending: false })
+        .limit(4);
     }
 
     const { data, error, count } = await queryBuilder;
 
+    if (data && search) {
+     const {data, error} =  await supabaseClient
+        .from('hotwords')
+        .insert({
+          search: search
+        })
+        .select()
+        .single();
+
+        console.log( ' 插入搜素记录 ', data, error)
+
+    }
+
     if (error) {
       console.error('Supabase fetch error:', error);
-      throw createError({ 
-        statusCode: 500, 
-        statusMessage: 'Failed to fetch exhibits' 
+      throw createError({
+        statusCode: 500,
+        statusMessage: 'Failed to fetch exhibits'
       });
     }
 
@@ -64,12 +79,12 @@ export default defineEventHandler(async (event: H3Event) => {
       pageSize,
       hasMore: (count ?? 0) > (to + 1),
     };
-    
+
   } catch (err: any) {
     console.error('Unhandled server error:', err);
-    throw createError({ 
-      statusCode: 500, 
-      statusMessage: 'Internal Server Error' 
+    throw createError({
+      statusCode: 500,
+      statusMessage: 'Internal Server Error'
     });
   }
 });
