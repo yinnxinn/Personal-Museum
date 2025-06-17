@@ -20,9 +20,9 @@ export const TIME_PERIODS = [
     end: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) 
   },
   { 
-    id: 'over-half-year', 
-    name: 'Over Half Year Ago', 
+    id: 'over-one-month', 
+    name: 'One Month Ago', 
     start: new Date(0), // 所有过去时间
-    end: new Date(Date.now() - 182 * 24 * 60 * 60 * 1000) // 半年前（约182天）
+    end: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) // 半年前（约182天）
   },
 ];

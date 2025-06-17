@@ -13,8 +13,6 @@ export default defineEventHandler(async (event) => {
 
     const searchValues = [...new Set(data?.map(item => item.search) || [])];
 
-
-
     return {
         keywords: searchValues
     };

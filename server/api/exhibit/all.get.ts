@@ -4,13 +4,15 @@ import { H3Event, getQuery, createError } from 'h3';
 
 export default defineEventHandler(async (event: H3Event) => {
   const query = getQuery(event);
-  const page = parseInt((query.page as string) || '0', 10);
+  const page = parseInt((query.page as string) || '1', 10);
   const pageSize = parseInt((query.pageSize as string) || '20', 10);
   const category = (query.category as string) || '';
   const search = (query.search as string) || '';
 
-  const from = (page - 1) * pageSize;
+  const from = (page-1) * pageSize;
   const to = from + pageSize - 1;
+
+  console.log(' get all 123123', query, page, pageSize, category, search)
 
 
   const supabaseClient = supabase(event);
@@ -19,44 +21,29 @@ export default defineEventHandler(async (event: H3Event) => {
     // 构建基本查询
     let queryBuilder = supabaseClient
       .from('exhibits')
-      .select('id, title, description, coverUrl, created_at, author',
+      .select('id, title, description, coverUrl, created_at, author', 
         { count: 'exact' }
       ).eq('privacy', 'public')
+      .order('title', { ascending: true })
+      .range(from, to);
 
+    // // 添加分类过滤
+    // if (category) {
+    //   queryBuilder = queryBuilder.eq('category', category);
+    // }
 
-    // 添加分类过滤
-    if (category) {
-      queryBuilder = queryBuilder.eq('category', category);
-    }
-
-    // 添加搜索过滤
-    if (search) {
-      queryBuilder = queryBuilder.ilike('title', `%${search}%`).range(from, to);
-    } else {
-      queryBuilder = queryBuilder.order('description', { ascending: false })
-        .limit(4);
-    }
+    // // 添加搜索过滤
+    // if (search) {
+    //   queryBuilder = queryBuilder.ilike('title', `%${search}%`);
+    // }
 
     const { data, error, count } = await queryBuilder;
 
-    if (data && search) {
-     const {data, error} =  await supabaseClient
-        .from('hotwords')
-        .insert({
-          search: search
-        })
-        .select()
-        .single();
-
-        console.log( ' 插入搜素记录 ', data, error)
-
-    }
-
     if (error) {
       console.error('Supabase fetch error:', error);
-      throw createError({
-        statusCode: 500,
-        statusMessage: 'Failed to fetch exhibits'
+      throw createError({ 
+        statusCode: 500, 
+        statusMessage: 'Failed to fetch exhibits' 
       });
     }
 
@@ -79,12 +66,12 @@ export default defineEventHandler(async (event: H3Event) => {
       pageSize,
       hasMore: (count ?? 0) > (to + 1),
     };
-
+    
   } catch (err: any) {
     console.error('Unhandled server error:', err);
-    throw createError({
-      statusCode: 500,
-      statusMessage: 'Internal Server Error'
+    throw createError({ 
+      statusCode: 500, 
+      statusMessage: 'Internal Server Error' 
     });
   }
 });

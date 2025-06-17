@@ -17,7 +17,7 @@
           <div class="w-full md:w-1/2 px-4"
                :class="{ 'md:pr-8 md:text-right': index % 2 === 0, 'md:pl-8 md:text-left': index % 2 !== 0 }">
             <h3 class="text-xl font-semibold text-gray-800">{{ $t(event.titleKey) }}</h3>
-            <p class="text-gray-600 text-sm">{{ $t(event.dateKey) }}</p>
+            <!-- <p class="text-gray-600 text-sm">{{ $t(event.dateKey) }}</p> -->
             <p class="text-gray-700 mt-2">{{ $t(event.descriptionKey) }}</p>
 
             <div v-if="event.associatedExhibits && event.associatedExhibits.length > 0" class="mt-6">

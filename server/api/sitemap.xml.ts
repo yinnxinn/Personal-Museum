@@ -19,7 +19,7 @@ const supabaseClient = supabase(event);
   }
   
   // 网站域名 - 生产环境中应从环境变量获取
-  const domain = process.env.SITE_URL || 'https://personal-museum.nilco2.com/';
+  const domain = process.env.SITE_URL || 'https://personal-museum.nilco2.com';
   
   // 生成sitemap XML
   let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';

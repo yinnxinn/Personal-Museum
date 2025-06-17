@@ -4,7 +4,6 @@
             :style="dynamicCoverStyle">
         </div>
 
-
         <div class="text-center px-4 py-6 mb-6">
             <div class="flex justify-center items-center space-x-4 mb-4">
                 <button @click="displayMode = 'list'"
@@ -35,7 +34,8 @@
                 <!-- <button @click="copyLink" class="hover:text-blue-500 transition">
                     <FontAwesomeIcon icon="fa-solid fa-link" />
                 </button> -->
-                <button v-if="canShare" @click="generateShareImage(exhibit)" class="hover:text-blue-700 transition">
+                <button v-if="canShare" @click="generateShareImage(exhibit, 'share')"
+                    class="hover:text-blue-700 transition">
                     <FontAwesomeIcon icon="fa-solid fa-book" class="mr-2" />
                     <!-- <img src="/xhs.svg" alt="Xiaohongshu Logo" class="w-6 h-6 inline-block" /> -->
                 </button>
@@ -107,7 +107,7 @@
                                     class="w-full h-full object-cover cursor-pointer"
                                     :class="{ 'aspect-video': displayMode === 'grid' }" @load="item.loaded = true" />
                             </a>
-                            <button @click.stop="generateShareImage(item)"
+                            <button @click.stop="generateShareImage(item, 'share')"
                                 class="absolute top-2 right-2 bg-gray-100 bg-opacity-75 rounded-md p-2 text-gray-600 hover:text-gray-800 transition z-10">
                                 <FontAwesomeIcon icon="fa-solid fa-download" class="text-sm" />
                             </button>
@@ -165,17 +165,21 @@
         </div>
     </div>
 
-    <div v-if="isShareOverlayVisible" class="fixed inset-0 w-full h-full bg-black bg-opacity-70 z-[60] flex justify-center items-center" @click="closeShareOverlay">
-    <div class="bg-white rounded-lg shadow-xl overflow-hidden p-4" @click.stop>
-        <img :src="shareOverlayImageUrl" alt="Share Image for Xiaohongshu" class="block max-w-[90vw] max-h-[90vh] object-contain mx-auto" />
-        <div class="mt-4 text-center">
-            <p class="text-gray-700 text-sm mb-2">长按或右键图片保存，然后手动分享</p>
-            <button @click="closeShareOverlay" class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-200">
-                关闭
-            </button>
+    <div v-if="isShareOverlayVisible"
+        class="fixed inset-0 w-full h-full bg-black bg-opacity-70 z-[60] flex justify-center items-center"
+        @click="closeShareOverlay">
+        <div class="bg-white rounded-lg shadow-xl overflow-hidden p-4" @click.stop>
+            <img :src="shareOverlayImageUrl" alt="Share Image for Xiaohongshu"
+                class="block max-w-[90vw] max-h-[90vh] object-contain mx-auto" />
+            <div class="mt-4 text-center">
+                <p class="text-gray-700 text-sm mb-2">长按或右键图片保存，然后手动分享</p>
+                <button @click="closeShareOverlay"
+                    class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-200">
+                    关闭
+                </button>
+            </div>
         </div>
     </div>
-</div>
 
 
 </template>
@@ -234,6 +238,39 @@ const displayMode = ref('list'); // 'list' or 'grid'
 const isDownloadOverlayVisible = ref(false);
 const downloadImageUrl = ref('');
 
+
+const { data, error } = await useFetch(`/api/exhibit/${exhibitId}`, {
+    key: `exhibit-details-${exhibitId}-${$auth.user.value?.id || 'public'}`,
+    query: () => ({
+        userId: $auth.isLoggedIn.value && $auth.user.value?.id ? $auth.user.value.id : undefined
+    }),
+    // 在响应后处理数据
+    transform: (response) => {
+        isLoading.value = false
+        if (!response?.exhibit) {
+            exhibitError.value = '未找到展品内容。'
+            return { id: '', title: '', coverUrl: '', description: '', datas: [] }
+        }
+        // 设置 exhibit 数据
+        const exhibitData = {
+            id: response.exhibit.id,
+            author: response.exhibit.author,
+            privacy: response.exhibit.privacy,
+            title: response.exhibit.title,
+            coverUrl: response.exhibit.coverUrl,
+            description: response.exhibit.description,
+            datas: response.exhibit.datas
+        }
+        shouldShowToggle.value = response.exhibit.description?.length > 150
+        return exhibitData
+    },
+    onResponseError: ({ response }) => {
+        isLoading.value = false
+        exhibitError.value = response.statusMessage || '无法加载展品内容。'
+        return { id: '', title: '', coverUrl: '', description: '', datas: [] }
+    }
+})
+
 const canShare = computed(() => {
     if (!exhibit.value.id) return false;
     if (exhibit.value.privacy === 'private') {
@@ -257,70 +294,6 @@ const throttle = (func, limit) => {
     };
 };
 
-const fetchExhibitDetails = async () => {
-    if (!exhibitId) {
-        exhibitError.value = '展品ID缺失。';
-        isLoading.value = false;
-        return;
-    }
-
-    isLoading.value = true;
-    exhibitError.value = null;
-
-    try {
-        const queryParams = {};
-        if ($auth.isLoggedIn.value && $auth.user.value?.id) {
-            queryParams.userId = $auth.user.value.id;
-        }
-
-        const { data, error } = await useFetch(`/api/exhibit/${exhibitId}`, {
-            query: queryParams,
-            key: `exhibit-details-${exhibitId}-${$auth.user.value?.id || 'public'}`,
-        });
-
-        if (error.value) {
-            console.error('Error fetching exhibit details:', error.value);
-            exhibitError.value = error.value.statusMessage || '无法加载展品内容。';
-            exhibit.value = { id: '', title: '', coverUrl: '', description: '', datas: [] };
-        } else if (data.value?.exhibit) {
-            exhibit.value.id = data.value.exhibit.id;
-            exhibit.value.author = data.value.exhibit.author;
-            exhibit.value.privacy = data.value.exhibit.privacy;
-            exhibit.value.title = data.value.exhibit.title;
-            exhibit.value.coverUrl = data.value.exhibit.coverUrl;
-            exhibit.value.description = data.value.exhibit.description;
-            shouldShowToggle.value = data.value.exhibit.description?.length > 150;
-            exhibit.value.datas = data.value.exhibit.datas;
-
-            await nextTick(); // 确保DOM已更新
-            if (galleryContainer.value) {
-                if (galleryInstance.value) {
-                    galleryInstance.value.destroy(true);
-                }
-                galleryInstance.value = lightGallery(galleryContainer.value, {
-                    selector: '.lg-trigger',
-                    plugins: [lgZoom, lgThumbnail],
-                    speed: 300,
-                    download: false,
-                    hash: false,
-                    closable: true,
-                });
-            }
-
-            page.value = 1;
-            await checkFavoriteStatus();
-        } else {
-            exhibitError.value = '未找到展品内容。';
-            exhibit.value = { id: '', title: '', coverUrl: '', description: '', datas: [] };
-        }
-    } catch (err) {
-        console.error('Client-side error fetching exhibit details:', err);
-        exhibitError.value = '发生了一个意外错误。';
-        exhibit.value = { id: '', title: '', coverUrl: '', description: '', datas: [] };
-    } finally {
-        isLoading.value = false;
-    }
-};
 
 const fetchExhibitItems = async (id, append = false) => {
     if (!id || isLoading.value) return;
@@ -374,13 +347,17 @@ const fetchExhibitItems = async (id, append = false) => {
     }
 };
 
-watch([isLoadingAuth, () => $auth.user.value?.id, () => route.params.id],
-    async ([newIsLoadingAuth, newUserId, newExhibitId], [oldIsLoadingAuth, oldUserId, oldExhibitId]) => {
-        if (!newIsLoadingAuth && newExhibitId && (newExhibitId !== oldExhibitId || newUserId !== oldUserId)) {
-            await fetchExhibitDetails();
-        }
-    }, { immediate: true }
-);
+// watch([isLoadingAuth, () => $auth.user.value?.id, () => route.params.id],
+//     async ([newIsLoadingAuth, newUserId, newExhibitId], [oldIsLoadingAuth, oldUserId, oldExhibitId]) => {
+//         if (!newIsLoadingAuth && newExhibitId && (newExhibitId !== oldExhibitId || newUserId !== oldUserId)) {
+//             await fetchExhibitDetails();
+//         }
+//     }, { immediate: true }
+// );
+
+watch(data, (newData) => {
+    exhibit.value = newData || { id: '', title: '', coverUrl: '', description: '', datas: [] }
+}, { immediate: true })
 
 const dynamicCoverStyle = computed(() => {
     if (!exhibit.value.datas || exhibit.value.datas?.length === 0) {
@@ -415,18 +392,6 @@ const dynamicCoverStyle = computed(() => {
         backgroundColor: '#f0f0f0'
     };
 });
-
-
-
-const closeDownloadOverlay = () => {
-    isDownloadOverlayVisible.value = false;
-    downloadImageUrl.value = '';
-};
-
-// Existing functions below...
-const isShareOverlayVisible = ref(false); // Controls visibility of the share image overlay
-const shareOverlayImageUrl = ref('');
-
 
 const generateShareImage = async (item, mode = 'share') => {
     if (!item || !item.title) return;
@@ -463,14 +428,14 @@ const generateShareImage = async (item, mode = 'share') => {
         imgContainer.style.borderRadius = '8px';
         imgContainer.style.overflow = 'hidden';
         imgContainer.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.05)';
-        
+
         const img = document.createElement('img');
         img.src = item.imageUrl || item.coverUrl;
         img.style.width = '100%';
         img.style.height = 'auto';
         img.style.display = 'block';
         img.style.objectFit = 'cover';
-        
+
         imgContainer.appendChild(img);
         container.appendChild(imgContainer);
     }
@@ -550,6 +515,148 @@ const generateShareImage = async (item, mode = 'share') => {
     }
 };
 
+// --- downloadImage 方法：生成并显示图片浮层 ---
+/*
+const downloadImage = async (item) => {
+    const tempShareContent = document.createElement('div');
+    tempShareContent.style.width = '750px'; // 小红书推荐尺寸宽度
+    tempShareContent.style.backgroundColor = '#f8f8f8';
+    tempShareContent.style.display = 'flex';
+    tempShareContent.style.flexDirection = 'column';
+    tempShareContent.style.alignItems = 'center';
+    tempShareContent.style.padding = '40px';
+    tempShareContent.style.boxSizing = 'border-box';
+    tempShareContent.style.position = 'absolute'; // 隐藏在屏幕外，用于渲染
+    tempShareContent.style.left = '-9999px';
+    tempShareContent.style.top = '-9999px';
+    tempShareContent.style.borderRadius = '8px';
+    tempShareContent.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.2)';
+
+    const img = document.createElement('img');
+    img.src = item.imageUrl;
+    img.style.width = '600px'; // 图片在卡片内的最大宽度
+    img.style.height = 'auto';
+    img.style.objectFit = 'contain';
+    img.style.marginBottom = '20px';
+    tempShareContent.appendChild(img);
+
+    const title = document.createElement('h3');
+    title.textContent = item.title;
+    title.style.fontSize = '36px'; // 适当的字体大小
+    title.style.fontWeight = 'bold';
+    title.style.textAlign = 'center';
+    title.style.marginBottom = '10px';
+    title.style.color = '#333';
+    tempShareContent.appendChild(title);
+
+    if (item.description) {
+        const description = document.createElement('p');
+        description.textContent = item.description;
+        description.style.fontSize = '24px';
+        description.style.textAlign = 'left';
+        description.style.color = '#f8f8f8';
+        description.style.lineHeight = '1.4';
+        tempShareContent.appendChild(description);
+    }
+
+    document.body.appendChild(tempShareContent);
+
+    try {
+        const canvas = await html2canvas(tempShareContent, {
+            useCORS: true,
+            allowTaint: true,
+            backgroundColor: '#f8f8f8',
+        });
+        downloadImageUrl.value = canvas.toDataURL('image/png');
+        isDownloadOverlayVisible.value = true; // 显示浮层
+    } catch (error) {
+        console.error('生成图片失败:', error);
+        alert('生成下载图片失败，请稍后再试。');
+    } finally {
+        document.body.removeChild(tempShareContent); // 移除临时创建的DOM元素
+    }
+}; */
+
+const closeDownloadOverlay = () => {
+    isDownloadOverlayVisible.value = false;
+    downloadImageUrl.value = '';
+};
+
+// Existing functions below...
+const isShareOverlayVisible = ref(false); // Controls visibility of the share image overlay
+const shareOverlayImageUrl = ref('');
+/*
+const shareToXiaohongshu = async () => {
+    if (!exhibit.value || !exhibit.value.title) return;
+
+    const shareContent = document.createElement('div');
+    shareContent.style.width = '750px';
+    shareContent.style.height = '1334px'; // Xiaohongshu recommended aspect ratio
+    shareContent.style.backgroundColor = '#f8f8f8';
+    shareContent.style.display = 'flex';
+    shareContent.style.flexDirection = 'column';
+    shareContent.style.alignItems = 'center';
+    shareContent.style.justifyContent = 'center';
+    shareContent.style.padding = '40px';
+    shareContent.style.boxSizing = 'border-box';
+    shareContent.style.position = 'absolute';
+    shareContent.style.left = '-9999px'; // Render off-screen for html2canvas
+    shareContent.style.top = '-9999px';
+
+    if (exhibit.value.coverUrl) {
+        const img = document.createElement('img');
+        img.src = exhibit.value.coverUrl;
+        img.style.width = '600px';
+        img.style.height = 'auto';
+        img.style.objectFit = 'contain';
+        img.style.marginBottom = '20px';
+        shareContent.appendChild(img);
+    }
+
+    const title = document.createElement('h1');
+    title.textContent = exhibit.value.title;
+    title.style.fontSize = '48px';
+    title.style.fontWeight = 'bold';
+    title.style.textAlign = 'center';
+    title.style.marginBottom = '20px';
+    title.style.color = '#333';
+    shareContent.appendChild(title);
+
+    const description = document.createElement('p');
+    description.textContent = exhibit.value.description;
+    description.style.fontSize = '32px';
+    description.style.textAlign = 'left';
+    description.style.color = '#666';
+    description.style.lineHeight = '1.5';
+    // Add some basic styling for description overflow if it's too long
+    description.style.maxHeight = '300px'; // Limit description height
+    description.style.overflowY = 'auto'; // Add scroll if content overflows
+    shareContent.appendChild(description);
+
+    document.body.appendChild(shareContent);
+
+    try {
+        const canvas = await html2canvas(shareContent, {
+            useCORS: true,
+            allowTaint: true,
+            backgroundColor: '#f8f8f8',
+        });
+        const image = canvas.toDataURL('image/png');
+
+        // --- MODIFIED PART ---
+        shareOverlayImageUrl.value = image;
+        isShareOverlayVisible.value = true;
+        // alert('图片已生成。请右键或长按保存图片，并手动打开小红书进行分享！'); // Optional alert
+        // --- END MODIFIED PART ---
+
+    } catch (error) {
+        console.error('生成图片失败:', error);
+        alert('生成分享图片失败，请稍后再试。');
+    } finally {
+        document.body.removeChild(shareContent);
+    }
+};*/
+
 // New function to close the share overlay
 const closeShareOverlay = () => {
     isShareOverlayVisible.value = false;
@@ -570,10 +677,35 @@ const handleScroll = throttle(() => {
     }
 }, 300);
 
+const shareUrl = ref('');
+const canUseDOM = typeof window !== 'undefined';
+
 onMounted(async () => {
-    window.addEventListener('scroll', handleScroll);
-    await fetchExhibitDetails();
-});
+    // 设置分享 URL
+    if (process.client) {
+        shareUrl.value = window.location.href
+        window.addEventListener('scroll', handleScroll)
+    }
+
+    // 初始化 lightGallery
+    await nextTick()
+    if (galleryContainer.value) {
+        if (galleryInstance.value) {
+            galleryInstance.value.destroy(true)
+        }
+        galleryInstance.value = lightGallery(galleryContainer.value, {
+            selector: '.lg-trigger',
+            plugins: [lgZoom, lgThumbnail],
+            speed: 300,
+            download: false,
+            hash: false,
+            closable: true
+        })
+    }
+
+    // 检查收藏状态
+    await checkFavoriteStatus()
+})
 
 onUnmounted(() => {
     window.removeEventListener('scroll', handleScroll);
@@ -636,9 +768,8 @@ const checkFavoriteStatus = async () => {
     }
 };
 
-const shareUrl = computed(() => {
-    return window.location.href;
-});
+
+
 
 const copyLink = async () => {
     try {

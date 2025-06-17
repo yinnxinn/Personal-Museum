@@ -8,7 +8,6 @@ export default defineEventHandler(async (event: H3Event) => {
 
 
   const supabaseClient = supabase(event);
-
   
   try {
     const periodId = event.context.params?.periodId;
@@ -29,8 +28,6 @@ export default defineEventHandler(async (event: H3Event) => {
       });
     }
 
-    // Initialize Supabase client
-    console.log( 'period ', period)
 
     // Directly query the 'exhibits' table
     const { data, error } = await supabaseClient
