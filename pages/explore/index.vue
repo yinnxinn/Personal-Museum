@@ -103,6 +103,17 @@
 </template>
 
 <script setup>
+
+useSeoMeta({
+  title: () => `Home | ${locale.value === 'zh' ? '个人博物馆' : 'Personal Museum'}`,
+  description: () => `Welcome to the ${locale.value === 'zh' ? '个人博物馆' : 'Personal Museum'} homepage. Explore our unique collections.`,
+  ogTitle: () => `Home | ${locale.value === 'zh' ? '个人博物馆' : 'Personal Museum'}`,
+  ogDescription: () => `Welcome to the ${locale.value === 'zh' ? '个人博物馆' : 'Personal Museum'} homepage. Explore our unique collections.`,
+  ogImage: 'https://personal-museum.nilco2.com/bg.jpg', // 替换为实际图片 URL
+  twitterCard: 'summary_large_image',
+});
+
+
 import { ref, computed, watch } from "vue";
 import { useRouter } from "vue-router";
 

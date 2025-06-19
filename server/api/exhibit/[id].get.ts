@@ -53,12 +53,14 @@ export default defineEventHandler(async (event: H3Event) => {
       .order('created_at', { ascending: false })
       .range(from, to);
 
+    console.log('from to' , from , to)
+
     if (listError) {
       console.error('Supabase image list error:', listError);
-      throw createError({
-        statusCode: 500,
-        statusMessage: 'Failed to fetch exhibit images',
-      });
+      // throw createError({
+      //   statusCode: 500,
+      //   statusMessage: 'Failed to fetch exhibit images',
+      // });
     }
 
 

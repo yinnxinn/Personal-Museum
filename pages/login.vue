@@ -69,6 +69,10 @@
 </template>
 
 <script setup>
+definePageMeta({
+  requiresAuth: false // 明确标记为不需要认证
+});
+
 import { ref } from 'vue';
 import { useRouter, useNuxtApp } from '#imports';
 import { useI18n } from 'vue-i18n';

@@ -47,8 +47,10 @@ export default defineNuxtConfig({
     redirectOptions: {
       login: '/login',
       callback: '/confirm',
-      exclude: ['/',
+      exclude: [
+        '/',
         '/en/',                        // Homepage (index.vue)
+        '/en',                        // Homepage (index.vue)
         '/about',
         '/en/about',
         '/explore',                // about.vue

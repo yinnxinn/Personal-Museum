@@ -12,6 +12,22 @@
 </template>
 
 <script setup>
+import { useI18n } from 'vue-i18n';
+const { locale } = useI18n(); // 这行是关键修复
+
+definePageMeta({
+  requiresAuth: false, // 明确标记为不需要认证
+});
+
+useSeoMeta({
+  title: () => `Home | ${locale.value === 'zh' ? '个人博物馆' : 'Personal Museum'}`,
+  description: () => `Welcome to the ${locale.value === 'zh' ? '个人博物馆' : 'Personal Museum'} homepage. Explore our unique collections.`,
+  ogTitle: () => `Home | ${locale.value === 'zh' ? '个人博物馆' : 'Personal Museum'}`,
+  ogDescription: () => `Welcome to the ${locale.value === 'zh' ? '个人博物馆' : 'Personal Museum'} homepage. Explore our unique collections.`,
+  ogImage: 'https://personal-museum.nilco2.com/bg.jpg', // 替换为实际图片 URL
+  twitterCard: 'summary_large_image',
+});
+
 import { ref, onMounted } from "vue";
 import { useNuxtApp } from "#app";
 

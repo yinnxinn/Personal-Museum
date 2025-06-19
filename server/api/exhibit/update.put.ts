@@ -58,6 +58,10 @@ export default defineEventHandler(async (event: H3Event) => {
     const itemsToInsert = items.filter((item: any) => !item.id || item.file); // New items or items that were just uploaded (identified by absence of id or presence of file)
     const itemsToUpdate = items.filter((item: any) => item.id && !item.file); // Existing items that might have updated title/description
 
+    console.log(itemsToDelete, 'itemsToDelete')
+    console.log(itemsToInsert, 'itemsToInsert')
+    console.log(itemsToUpdate, 'itemsToUpdate')
+
     // Delete removed items
     if (itemsToDelete.length > 0) {
       const { error: deleteError } = await supabaseClient

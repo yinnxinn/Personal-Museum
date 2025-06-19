@@ -222,7 +222,7 @@ useSeoMeta({
 const showFullDescription = ref(false);
 const shouldShowToggle = ref(true);
 const page = ref(1);
-const pageSize = 8;
+const pageSize = 10;
 const isLoading = ref(true);
 const hasMore = ref(true);
 const galleryInstance = ref(null);

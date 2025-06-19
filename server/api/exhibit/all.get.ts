@@ -12,8 +12,6 @@ export default defineEventHandler(async (event: H3Event) => {
   const from = (page-1) * pageSize;
   const to = from + pageSize - 1;
 
-  console.log(' get all 123123', query, page, pageSize, category, search)
-
 
   const supabaseClient = supabase(event);
 
