@@ -14,7 +14,6 @@
     "title": "探索历史时间线",
     "subtitle": "通过互动时间线，回顾重要的历史时刻和文化事件。",
     "associated_exhibits_title": "相关展览"
-    
   },
   "cta_section": {
     "title": "发现更多，创造无限",
@@ -81,8 +80,27 @@
     "section_vision_title": "我们的愿景",
     "section_vision_desc": "我们相信，每一份热爱都值得被记录与分享。“个人博物馆”项目致力于成为全球收藏爱好者首选的数字化管理和展示平台，让您的收藏不仅仅是物品，更是连接世界、传递文化的桥梁。我们期待与您一同，开启数字策展的新篇章。"
   },
-  "Past Day":"过去一天",
-  "Past Week":"过去一周",
-  "Past Month":"过去一月",
-  "One Month Ago":"一个月前"
-} 
+  "Past Day": "过去一天",
+  "Past Week": "过去一周",
+  "Past Month": "过去一月",
+  "One Month Ago": "一个月前",
+  "museums": {
+    "louvre": "卢浮宫",
+    "british-museum": "大英博物馆",
+    "metropolitan": "大都会艺术博物馆",
+    "vatican-museums": "梵蒂冈博物馆",
+    "uffizi-gallery": "乌菲兹美术馆",
+    "rijksmuseum": "国立博物馆",
+    "orsay": "奥赛博物馆",
+    "guggenheim": "所罗门·R·古根海姆博物馆",
+    "getty": "盖蒂博物馆",
+    "prado": "普拉多博物馆",
+    "nmaahc": "国家非裔美国人历史与文化博物馆",
+    "frans-hals": "弗兰斯·哈尔斯博物馆",
+    "pergamon": "佩加蒙博物馆",
+    "natural-history": "国家自然历史博物馆",
+    "national-gallery": "国家画廊",
+    "google-arts": "谷歌艺术与文化",
+    "gallerix": "盖勒里克斯"
+  }
+}

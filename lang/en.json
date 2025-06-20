@@ -10,9 +10,9 @@
     "experience_now": "Experience Now",
     "start_quiz": "Start Quiz"
   },
-  "timeline_section":{
+  "timeline_section": {
     "associated_exhibits_title": "Associated Exhibits",
-    "title":"Explore Historical Timeline",
+    "title": "Explore Historical Timeline",
     "subtitle": "Interactively explore historical events through an interactive timeline."
   },
   "cta_section": {
@@ -43,7 +43,6 @@
     "terms_of_service": "Terms of Service",
     "privacy_policy": "Privacy Policy"
   },
-  
   "new_activity": {
     "title": "Interactive Timeline",
     "description": "Explore historical events through an interactive timeline."
@@ -84,5 +83,24 @@
     "tech_deployment": "Deployment",
     "section_vision_title": "Our Vision",
     "section_vision_desc": "We believe that every passion deserves to be recorded and shared. The \"Personal Museum\" project aims to become the preferred digital management and display platform for collectors worldwide, making your collection not just items, but a bridge connecting the world and transmitting culture. We look forward to embarking on a new chapter of digital curation with you."
+  },
+  "museums": {
+    "louvre": "The Louvre",
+    "british-museum": "The British Museum",
+    "metropolitan": "The Metropolitan Museum of Art",
+    "vatican-museums": "Vatican Museums",
+    "uffizi-gallery": "Uffizi Gallery",
+    "rijksmuseum": "Rijksmuseum",
+    "orsay": "Musée d'Orsay",
+    "guggenheim": "Solomon R. Guggenheim Museum",
+    "getty": "The J. Paul Getty Museum",
+    "prado": "Museo del Prado",
+    "nmaahc": "National Museum of African American History & Culture",
+    "frans-hals": "Frans Hals Museum",
+    "pergamon": "Pergamon Museum",
+    "natural-history": "National Museum of Natural History",
+    "national-gallery": "National Gallery",
+    "google-arts": "Google Arts & Culture",
+    "gallerix": "Gallerix"
   }
 }

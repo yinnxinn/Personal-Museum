@@ -11,9 +11,9 @@
       <h3 class="text-xl font-semibold mb-2 text-gray-900">
         {{ item.titleKey }}
       </h3>
-      <p class="text-gray-600 text-sm mb-4 min-h-[120px]">
+      <div class="text-gray-600 text-sm mb-2 overflow-y-auto" style="max-height: 100px;">
         {{ item.descriptionKey }}
-      </p>
+      </div>
     </div>
   </div>
 </template>
