@@ -71,6 +71,10 @@ import { library } from "@fortawesome/fontawesome-svg-core";
 import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
+definePageMeta({
+  requiresAuth: false, // 明确标记为不需要认证
+});
+
 const route = useRoute();
 const router = useRouter();
 const { $localePath } = useNuxtApp();

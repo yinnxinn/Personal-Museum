@@ -3,7 +3,7 @@ import path from 'path';
 
 // 在现有配置中添加
 export default defineNuxtConfig({
-  ssr: true,
+  ssr: false,
   modules: [
     '@nuxtjs/i18n', // 添加 i18n 模块
     '@nuxtjs/supabase',
@@ -57,8 +57,8 @@ export default defineNuxtConfig({
         '/en/explore',                // about.vue
         '/exhibit/*',
         '/en/exhibit/*',
-        '/search/*',
-        '/en/search/*'
+        '/search*',
+        '/en/search*'
       ]
     },
   },

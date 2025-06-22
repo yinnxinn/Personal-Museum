@@ -104,6 +104,8 @@
 
 <script setup>
 
+const { locale } = useI18n(); 
+
 useSeoMeta({
   title: () => `Home | ${locale.value === 'zh' ? '个人博物馆' : 'Personal Museum'}`,
   description: () => `Welcome to the ${locale.value === 'zh' ? '个人博物馆' : 'Personal Museum'} homepage. Explore our unique collections.`,
