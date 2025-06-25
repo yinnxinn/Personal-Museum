@@ -1,6 +1,7 @@
 <template>
   <section class="relative h-96 md:h-[500px] lg:h-[600px] bg-cover bg-center flex items-center justify-center text-white"
-             :style="{ backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('${backgroundImageUrl}')` }">
+             :style="{ backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('${backgroundImageUrl}')` }"
+             loading="lazy">
     <div class="text-center px-4">
       <h1 class="text-3xl md:text-5xl lg:text-6xl font-bold mb-4 drop-shadow-lg">
         {{ $t('hero.title') }}
@@ -21,7 +22,7 @@ const props = defineProps({
   backgroundImageUrl: {
     type: String,
     required: true,
-    default: '/bg.jpg' // Default fallback
+    default: '/bg.png' // Default fallback
   }
 });
 </script>

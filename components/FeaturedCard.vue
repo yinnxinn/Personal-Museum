@@ -6,7 +6,12 @@
     tabindex="0"
     @keydown.enter="$router.push(item.link)"
   >
-    <img :src="item.image" :alt="item.title" class="w-full h-48 object-cover" />
+      <img
+        :src="item.image"
+        :alt="item.titleKey"
+        class="w-full h-48 object-cover rounded-t-lg"
+        loading="lazy"
+      />
     <div class="p-5 flex flex-col flex-grow">
       <h3 class="text-xl font-semibold mb-2 text-gray-900">
         {{ item.titleKey }}

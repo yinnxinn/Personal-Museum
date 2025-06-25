@@ -24,7 +24,7 @@ useSeoMeta({
   description: () => `Welcome to the ${locale.value === 'zh' ? '个人博物馆' : 'Personal Museum'} homepage. Explore our unique collections.`,
   ogTitle: () => `Home | ${locale.value === 'zh' ? '个人博物馆' : 'Personal Museum'}`,
   ogDescription: () => `Welcome to the ${locale.value === 'zh' ? '个人博物馆' : 'Personal Museum'} homepage. Explore our unique collections.`,
-  ogImage: 'https://personal-museum.nilco2.com/bg.jpg', // 替换为实际图片 URL
+  ogImage: 'https://personal-museum.nilco2.com/bg.png', // 替换为实际图片 URL
   twitterCard: 'summary_large_image',
 });
 
@@ -40,7 +40,7 @@ import CallToActionSection from "~/components/CallToActionSection.vue";
 const { $auth } = useNuxtApp();
 
 // Data for HeroSection
-const heroBackgroundImage = "/bg.jpg";
+const heroBackgroundImage = "/bg.png";
 
 // Reactive data for sections that will be fetched from APIs
 const featuredCards = ref([]);
@@ -114,43 +114,8 @@ const { data: timelineData, error: timelineError } = await useAsyncData(
   "timeline-events",
   async () => {
     try {
-      // Fetch timeline periods
-      const timelinePeriods = await $fetch("/api/timeline-events");
-
-      // Fetch associated exhibits for each period
-      const populatedTimeline = await Promise.all(
-        timelinePeriods.map(async (period) => {
-          let exhibitsForPeriod = [];
-
-          try {
-            const mostLikedExhibits = await $fetch(
-              `/api/exhibit/period/${period.id}`
-            );
-            exhibitsForPeriod = mostLikedExhibits
-              .slice(0, 3)
-              .map((exhibit) => ({
-                id: exhibit.id,
-                title: exhibit.title,
-                link: `/exhibit/${exhibit.id}`,
-                imageUrl: exhibit.imageUrl,
-              }));
-          } catch (popularExhibitError) {
-            console.error(
-              `Could not fetch most liked exhibits for period ${period.id}:`,
-              popularExhibitError
-            );
-          }
-
-          return {
-            titleKey: period.name,
-            dateKey: period.date_range,
-            descriptionKey: "",
-            associatedExhibits: exhibitsForPeriod,
-          };
-        })
-      );
-
-      return populatedTimeline;
+      const response = await $fetch("/api/timeline-events");
+      return response;
     } catch (err) {
       console.error("Error fetching timeline data:", err);
       return []; // Fallback to empty array to prevent rendering issues

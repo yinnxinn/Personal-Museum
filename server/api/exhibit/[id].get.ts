@@ -48,7 +48,7 @@ export default defineEventHandler(async (event: H3Event) => {
     // 分页获取展品的图片项
     const { data: items, error: listError, count } = await supabaseClient
       .from('images')
-      .select('id, title, description, image_url, author', { count: 'exact' })
+      .select('id, title, description, image_url, preview_url, author', { count: 'exact' })
       .eq('exhibitId', id)
       .order('created_at', { ascending: false })
       .range(from, to);
@@ -80,6 +80,7 @@ export default defineEventHandler(async (event: H3Event) => {
           title: item.title,
           description: item.description,
           imageUrl: item.image_url,
+          previewUrl: item.preview_url,
           author: item.author
 
         })) || [],

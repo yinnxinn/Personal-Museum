@@ -36,7 +36,8 @@
                           :to="exhibit.link"
                           class="block bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden group">
                   <img :src="exhibit.imageUrl || '/avatar.png'" :alt="exhibit.title"
-                       class="w-full h-32 object-cover object-center transform group-hover:scale-105 transition-transform duration-300">
+                       class="w-full h-32 object-cover object-center transform group-hover:scale-105 transition-transform duration-300"
+                       loading="lazy">
                   <div class="p-3">
                     <p class="text-sm font-medium text-gray-900 group-hover:text-blue-600 truncate">{{ exhibit.title }}</p>
                     <p v-if="exhibit.authorUsername" class="text-xs text-gray-500 mt-1">

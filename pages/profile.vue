@@ -7,7 +7,7 @@
 
     <div v-else-if="$auth.user.value" class="text-center mb-8">
       <img :src="$auth.user.value.user_metadata?.avatar_url || '/avatar.png'" :alt="$auth.user.value.user_metadata?.full_name || '用户头像'"
-        class="w-24 h-24 rounded-full mx-auto mb-4 object-cover border-4 border-indigo-500 shadow-lg">
+        class="w-24 h-24 rounded-full mx-auto mb-4 object-cover border-4 border-indigo-500 shadow-lg" loading="lazy">
       <h1 class="text-3xl font-bold text-gray-900">欢迎, {{ $auth.user.value.user_metadata?.full_name || $auth.user.value.email || '用户' }}!</h1>
       <p class="text-gray-600">管理你的展品和收藏。</p>
     </div>
@@ -44,7 +44,7 @@
         <div v-if="likedExhibits.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           <div v-for="exhibit in likedExhibits" :key="exhibit.id"
             class="border rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200 flex flex-col h-full">
-            <img :src="exhibit.coverUrl || '/placeholder-cover.png'" :alt="exhibit.title" class="w-full h-48 object-cover">
+            <img :src="exhibit.coverUrl || '/placeholder-cover.png'" :alt="exhibit.title" class="w-full h-48 object-cover" loading="lazy">
             <div class="p-4 flex flex-col flex-grow">
               <h3 class="font-bold text-lg mb-1">{{ exhibit.title }}</h3>
               <p class="text-gray-600 text-sm line-clamp-2 mb-4 flex-grow">{{ exhibit.description }}</p>
@@ -67,7 +67,7 @@
         <div v-if="createdExhibits.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           <div v-for="exhibit in createdExhibits" :key="exhibit.id"
             class="border rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200 flex flex-col h-full">
-            <img :src="exhibit.coverUrl || '/placeholder-cover.png'" :alt="exhibit.title" class="w-full h-48 object-cover">
+            <img :src="exhibit.coverUrl || '/placeholder-cover.png'" :alt="exhibit.title" class="w-full h-48 object-cover" loading="lazy">
             <div class="p-4 flex flex-col flex-grow">
               <h3 class="font-bold text-lg mb-1">{{ exhibit.title }}</h3>
               <p class="text-gray-600 text-sm line-clamp-2 mb-4 flex-grow">{{ exhibit.description }}</p>

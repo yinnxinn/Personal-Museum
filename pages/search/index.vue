@@ -48,6 +48,7 @@
               :src="item.cover" 
               :alt="item.title" 
               class="w-full h-48 object-cover" 
+              loading="lazy"
             />
             <div class="p-4">
               <h3 class="font-bold text-lg text-gray-900 mb-1 line-clamp-1">{{ item.title }}</h3>
@@ -70,10 +71,6 @@ import { useNuxtApp } from "#app";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-
-definePageMeta({
-  requiresAuth: false, // 明确标记为不需要认证
-});
 
 const route = useRoute();
 const router = useRouter();

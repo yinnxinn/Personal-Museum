@@ -83,6 +83,7 @@ export default defineEventHandler(async (event: H3Event) => {
       const formattedNewItems = itemsToInsert.map((item: any) => ({
         exhibitId: id,
         image_url: item.imageUrl, // This should be the URL from Supabase Storage
+        preview_url: item.previewUrl, // Add previewUrl
         title: item.title,
         description: item.description,
       }));

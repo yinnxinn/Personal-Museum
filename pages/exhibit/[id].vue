@@ -105,7 +105,8 @@
                                 :data-sub-html="`<div class='lg-caption'><h4>${item.title}</h4><p>${item.description || ''}</p></div>`">
                                 <img v-show="item.loaded" :src="item.imageUrl" :alt="item.title"
                                     class="w-full h-full object-cover cursor-pointer"
-                                    :class="{ 'aspect-video': displayMode === 'grid' }" @load="item.loaded = true" />
+                                    :class="{ 'aspect-video': displayMode === 'grid' }" @load="item.loaded = true"
+                                    loading="lazy" />
                             </a>
                             <button @click.stop="generateShareImage(item, 'share')"
                                 class="absolute top-2 right-2 bg-gray-100 bg-opacity-75 rounded-md p-2 text-gray-600 hover:text-gray-800 transition z-10">
@@ -195,6 +196,7 @@ import lgThumbnail from 'lightgallery/plugins/thumbnail';
 import 'lightgallery/css/lightgallery.css';
 import 'lightgallery/css/lg-zoom.css';
 import 'lightgallery/css/lg-thumbnail.css';
+import '~/assets/css/share-image.css';
 import html2canvas from 'html2canvas';
 
 const { $auth } = useNuxtApp();
@@ -361,7 +363,7 @@ watch(data, (newData) => {
 
 const dynamicCoverStyle = computed(() => {
     if (!exhibit.value.datas || exhibit.value.datas?.length === 0) {
-        return { backgroundImage: 'url(/bg.jpg)' };
+        return { backgroundImage: 'url(/bg.png)' };
     }
 
     const numImages = Math.min(10, exhibit.value.datas.length);
@@ -398,43 +400,20 @@ const generateShareImage = async (item, mode = 'share') => {
 
     const container = document.createElement('div');
     container.style.width = '750px';
-    container.style.backgroundColor = '#f9f7f5'; // 柔和的米白色背景
-    container.style.display = 'flex';
-    container.style.flexDirection = 'column';
-    container.style.alignItems = 'center';
-    container.style.justifyContent = 'flex-start';
-    container.style.padding = '50px'; // 增加内边距
-    container.style.boxSizing = 'border-box';
-    container.style.position = 'absolute';
-    container.style.left = '-9999px';
-    container.style.top = '-9999px';
-    container.style.borderRadius = '12px'; // 更大的圆角
-    container.style.boxShadow = '0 8px 24px rgba(0, 0, 0, 0.08)'; // 更柔和的阴影
-    container.style.fontFamily = '"Helvetica Neue", Arial, sans-serif'; // 优雅的字体
+    container.classList.add('share-image-container');
 
     // 添加艺术装饰元素
     const artDecoTop = document.createElement('div');
-    artDecoTop.style.width = '100%';
-    artDecoTop.style.height = '4px';
-    artDecoTop.style.backgroundColor = '#d4b996'; // 金色装饰线
-    artDecoTop.style.marginBottom = '30px';
-    artDecoTop.style.borderRadius = '2px';
+    artDecoTop.classList.add('share-image-art-deco-top');
     container.appendChild(artDecoTop);
 
     if (item.imageUrl || item.coverUrl) {
         const imgContainer = document.createElement('div');
-        imgContainer.style.width = '100%';
-        imgContainer.style.marginBottom = '30px';
-        imgContainer.style.borderRadius = '8px';
-        imgContainer.style.overflow = 'hidden';
-        imgContainer.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.05)';
+        imgContainer.classList.add('share-image-img-container');
 
         const img = document.createElement('img');
         img.src = item.imageUrl || item.coverUrl;
-        img.style.width = '100%';
-        img.style.height = 'auto';
-        img.style.display = 'block';
-        img.style.objectFit = 'cover';
+        img.classList.add('share-image-img');
 
         imgContainer.appendChild(img);
         container.appendChild(imgContainer);
@@ -442,53 +421,32 @@ const generateShareImage = async (item, mode = 'share') => {
 
     // 标题容器添加背景和边框
     const titleContainer = document.createElement('div');
-    titleContainer.style.width = '100%';
-    titleContainer.style.padding = '20px';
-    titleContainer.style.backgroundColor = '#ffffff'; // 纯白背景
-    titleContainer.style.borderRadius = '8px';
-    titleContainer.style.marginBottom = '25px';
-    titleContainer.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.03)';
-    titleContainer.style.borderLeft = '4px solid #d4b996'; // 金色装饰条
+    titleContainer.classList.add('share-image-title-container');
 
     const title = document.createElement(item.titleFontTag || 'h2');
     title.textContent = item.title;
-    title.style.fontSize = mode === 'share' ? '42px' : '36px';
-    title.style.fontWeight = '600'; // 中等粗体
-    title.style.textAlign = 'left';
-    title.style.margin = '0';
-    title.style.color = '#3a3a3a'; // 深灰替代纯黑
-    title.style.lineHeight = '1.3';
-    title.style.letterSpacing = '-0.5px'; // 紧凑字距
+    title.classList.add('share-image-title');
+    title.classList.add(mode === 'share' ? 'share-mode' : 'download-mode');
     titleContainer.appendChild(title);
     container.appendChild(titleContainer);
 
     if (item.description) {
         const description = document.createElement('div');
         description.textContent = item.description;
-        description.style.fontSize = mode === 'share' ? '30px' : '24px';
-        description.style.textAlign = 'left';
-        description.style.color = '#5c5c5c'; // 中灰色
-        description.style.lineHeight = '1.6';
-        description.style.whiteSpace = 'pre-wrap';
-        description.style.padding = '0 10px';
-        description.style.fontFamily = '"Georgia", serif'; // 优雅衬线字体
+        description.classList.add('share-image-description');
+        description.classList.add(mode === 'share' ? 'share-mode' : 'download-mode');
         container.appendChild(description);
     }
 
     // 添加底部水印
     const watermark = document.createElement('div');
-    watermark.style.width = '100%';
-    watermark.style.textAlign = 'center';
-    watermark.style.marginTop = '30px';
-    watermark.style.paddingTop = '20px';
-    watermark.style.borderTop = '1px solid #eae6e0'; // 柔和的边框
-    watermark.style.color = '#a0a0a0'; // 浅灰色
-    watermark.style.fontSize = '24px';
+    watermark.classList.add('share-image-watermark');
     watermark.textContent = 'Personal Museum · 数字艺术收藏';
     container.appendChild(watermark);
 
     document.body.appendChild(container);
 
+    await nextTick(); // 确保DOM完全渲染
     try {
         const canvas = await html2canvas(container, {
             useCORS: true,

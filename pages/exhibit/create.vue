@@ -75,6 +75,7 @@
               :src="item.previewUrl || item.imageUrl"
               :alt="item.title || '图片预览'"
               class="w-full h-24 object-cover"
+              loading="lazy"
             />
             <div
               class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center text-white text-sm font-semibold opacity-0 hover:opacity-100 transition-opacity"
@@ -91,6 +92,7 @@
           <img
             :src="exhibit.coverUrl"
             class="inline-block h-8 w-8 object-cover rounded-full ml-2"
+            loading="lazy"
           />
         </p>
         <button
@@ -133,6 +135,7 @@
                 :src="item.previewUrl || item.imageUrl"
                 :alt="item.title || '图片预览'"
                 class="w-full h-48 object-cover rounded-md mb-3"
+                loading="lazy"
               />
               <div class="mb-2">
                 <label
@@ -352,7 +355,7 @@ const uploadImage = async (file) => {
       throw new Error(errorData.statusMessage || "Image upload failed");
     }
     const data = await response.json();
-    return data.urls[0]; // Assuming single file upload per call for simplicity
+    return data; // 后端现在返回包含 imageUrl 和 previewUrl 的对象
   } catch (error) {
     console.error("Error uploading image:", error);
     throw error;
@@ -373,14 +376,14 @@ const saveExhibit = async () => {
           throw new Error("只能上传图片文件");
         }
 
-        const imageUrl = await uploadImage(item.file);
+        const uploadedImage = await uploadImage(item.file); // 后端现在返回包含 imageUrl 和 previewUrl 的对象
         if (exhibit.value.coverUrl === item.previewUrl) {
-          exhibit.value.coverUrl = imageUrl;
+          exhibit.value.coverUrl = uploadedImage.previewUrl; // 优先使用缩略图作为封面
         }
         item.author = $auth.user.value.id;
         item.exhibitId = exhibit.value.id;
-        item.imageUrl = imageUrl;
-        item.previewUrl = imageUrl;
+        item.imageUrl = uploadedImage.imageUrl;
+        item.previewUrl = uploadedImage.previewUrl;
         delete item.file;
       });
 
@@ -390,7 +393,7 @@ const saveExhibit = async () => {
       const randomIndex = Math.floor(
         Math.random() * exhibit.value.items.length
       );
-      exhibit.value.coverUrl = exhibit.value.items[randomIndex].imageUrl;
+      exhibit.value.coverUrl = exhibit.value.items[randomIndex].previewUrl || exhibit.value.items[randomIndex].imageUrl;
     }
 
     const payload = {
@@ -401,8 +404,9 @@ const saveExhibit = async () => {
       author: $auth.user.value.id,
       coverUrl: exhibit.value.coverUrl,
       items: exhibit.value.items.map(
-        ({ imageUrl, title, description, author, exhibitId }) => ({
+        ({ imageUrl, previewUrl, title, description, author, exhibitId }) => ({
           imageUrl,
+          previewUrl,
           title,
           description,
           author,

@@ -52,6 +52,7 @@
             :src="recExhibit.cover"
             :alt="recExhibit.title"
             class="w-full h-48 object-cover"
+            loading="lazy"
           />
           <div class="p-4">
             <h3 class="font-bold text-lg text-gray-900 mb-1 line-clamp-1">
@@ -85,6 +86,7 @@
             :src="exhibitItem.cover"
             :alt="exhibitItem.title"
             class="w-full h-48 object-cover"
+            loading="lazy"
           />
           <div class="p-4">
             <h3 class="font-bold text-lg text-gray-900 mb-1 line-clamp-1">
@@ -103,15 +105,14 @@
 </template>
 
 <script setup>
-
+import { useI18n } from 'vue-i18n';
 const { locale } = useI18n(); 
-
 useSeoMeta({
   title: () => `Home | ${locale.value === 'zh' ? '个人博物馆' : 'Personal Museum'}`,
   description: () => `Welcome to the ${locale.value === 'zh' ? '个人博物馆' : 'Personal Museum'} homepage. Explore our unique collections.`,
   ogTitle: () => `Home | ${locale.value === 'zh' ? '个人博物馆' : 'Personal Museum'}`,
   ogDescription: () => `Welcome to the ${locale.value === 'zh' ? '个人博物馆' : 'Personal Museum'} homepage. Explore our unique collections.`,
-  ogImage: 'https://personal-museum.nilco2.com/bg.jpg', // 替换为实际图片 URL
+  ogImage: 'https://personal-museum.nilco2.com/bg.png', // 替换为实际图片 URL
   twitterCard: 'summary_large_image',
 });
 
