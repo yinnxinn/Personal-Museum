@@ -25,6 +25,7 @@ useSeoMeta({
   ogTitle: () => `Home | ${locale.value === 'zh' ? '个人博物馆' : 'Personal Museum'}`,
   ogDescription: () => `Welcome to the ${locale.value === 'zh' ? '个人博物馆' : 'Personal Museum'} homepage. Explore our unique collections.`,
   ogImage: 'https://personal-museum.nilco2.com/bg.png', // 替换为实际图片 URL
+  twitterImage: 'https://personal-museum.nilco2.com/bg.png',
   twitterCard: 'summary_large_image',
 });
 

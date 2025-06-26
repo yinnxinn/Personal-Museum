@@ -34,8 +34,7 @@
                 <!-- <button @click="copyLink" class="hover:text-blue-500 transition">
                     <FontAwesomeIcon icon="fa-solid fa-link" />
                 </button> -->
-                <button v-if="canShare" @click="generateShareImage(exhibit, 'share')"
-                    class="hover:text-blue-700 transition">
+                <button v-if="canShare" @click="generateShareImage(exhibit, 'share')" class="hover:text-blue-700 transition">
                     <FontAwesomeIcon icon="fa-solid fa-book" class="mr-2" />
                     <!-- <img src="/xhs.svg" alt="Xiaohongshu Logo" class="w-6 h-6 inline-block" /> -->
                 </button>
@@ -105,8 +104,7 @@
                                 :data-sub-html="`<div class='lg-caption'><h4>${item.title}</h4><p>${item.description || ''}</p></div>`">
                                 <img v-show="item.loaded" :src="item.imageUrl" :alt="item.title"
                                     class="w-full h-full object-cover cursor-pointer"
-                                    :class="{ 'aspect-video': displayMode === 'grid' }" @load="item.loaded = true"
-                                    loading="lazy" />
+                                    :class="{ 'aspect-video': displayMode === 'grid' }" @load="item.loaded = true" />
                             </a>
                             <button @click.stop="generateShareImage(item, 'share')"
                                 class="absolute top-2 right-2 bg-gray-100 bg-opacity-75 rounded-md p-2 text-gray-600 hover:text-gray-800 transition z-10">
@@ -166,21 +164,17 @@
         </div>
     </div>
 
-    <div v-if="isShareOverlayVisible"
-        class="fixed inset-0 w-full h-full bg-black bg-opacity-70 z-[60] flex justify-center items-center"
-        @click="closeShareOverlay">
-        <div class="bg-white rounded-lg shadow-xl overflow-hidden p-4" @click.stop>
-            <img :src="shareOverlayImageUrl" alt="Share Image for Xiaohongshu"
-                class="block max-w-[90vw] max-h-[90vh] object-contain mx-auto" />
-            <div class="mt-4 text-center">
-                <p class="text-gray-700 text-sm mb-2">长按或右键图片保存，然后手动分享</p>
-                <button @click="closeShareOverlay"
-                    class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-200">
-                    关闭
-                </button>
-            </div>
+    <div v-if="isShareOverlayVisible" class="fixed inset-0 w-full h-full bg-black bg-opacity-70 z-[60] flex justify-center items-center" @click="closeShareOverlay">
+    <div class="bg-white rounded-lg shadow-xl overflow-hidden p-4" @click.stop>
+        <img :src="shareOverlayImageUrl" alt="Share Image for Xiaohongshu" class="block max-w-[90vw] max-h-[90vh] object-contain mx-auto" />
+        <div class="mt-4 text-center">
+            <p class="text-gray-700 text-sm mb-2">长按或右键图片保存，然后手动分享</p>
+            <button @click="closeShareOverlay" class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-200">
+                关闭
+            </button>
         </div>
     </div>
+</div>
 
 
 </template>
@@ -196,7 +190,6 @@ import lgThumbnail from 'lightgallery/plugins/thumbnail';
 import 'lightgallery/css/lightgallery.css';
 import 'lightgallery/css/lg-zoom.css';
 import 'lightgallery/css/lg-thumbnail.css';
-import '~/assets/css/share-image.css';
 import html2canvas from 'html2canvas';
 
 const { $auth } = useNuxtApp();
@@ -225,7 +218,7 @@ useSeoMeta({
 const showFullDescription = ref(false);
 const shouldShowToggle = ref(true);
 const page = ref(1);
-const pageSize = 10;
+const pageSize = 8;
 const isLoading = ref(true);
 const hasMore = ref(true);
 const galleryInstance = ref(null);
@@ -240,39 +233,6 @@ const displayMode = ref('list'); // 'list' or 'grid'
 // --- 新增的状态变量 for download overlay ---
 const isDownloadOverlayVisible = ref(false);
 const downloadImageUrl = ref('');
-
-
-const { data, error } = await useFetch(`/api/exhibit/${exhibitId}`, {
-    key: `exhibit-details-${exhibitId}-${$auth.user.value?.id || 'public'}`,
-    query: () => ({
-        userId: $auth.isLoggedIn.value && $auth.user.value?.id ? $auth.user.value.id : undefined
-    }),
-    // 在响应后处理数据
-    transform: (response) => {
-        isLoading.value = false
-        if (!response?.exhibit) {
-            exhibitError.value = '未找到展品内容。'
-            return { id: '', title: '', coverUrl: '', description: '', datas: [] }
-        }
-        // 设置 exhibit 数据
-        const exhibitData = {
-            id: response.exhibit.id,
-            author: response.exhibit.author,
-            privacy: response.exhibit.privacy,
-            title: response.exhibit.title,
-            coverUrl: response.exhibit.coverUrl,
-            description: response.exhibit.description,
-            datas: response.exhibit.datas
-        }
-        shouldShowToggle.value = response.exhibit.description?.length > 150
-        return exhibitData
-    },
-    onResponseError: ({ response }) => {
-        isLoading.value = false
-        exhibitError.value = response.statusMessage || '无法加载展品内容。'
-        return { id: '', title: '', coverUrl: '', description: '', datas: [] }
-    }
-})
 
 const canShare = computed(() => {
     if (!exhibit.value.id) return false;
@@ -297,6 +257,70 @@ const throttle = (func, limit) => {
     };
 };
 
+const fetchExhibitDetails = async () => {
+    if (!exhibitId) {
+        exhibitError.value = '展品ID缺失。';
+        isLoading.value = false;
+        return;
+    }
+
+    isLoading.value = true;
+    exhibitError.value = null;
+
+    try {
+        const queryParams = {};
+        if ($auth.isLoggedIn.value && $auth.user.value?.id) {
+            queryParams.userId = $auth.user.value.id;
+        }
+
+        const { data, error } = await useFetch(`/api/exhibit/${exhibitId}`, {
+            query: queryParams,
+            key: `exhibit-details-${exhibitId}-${$auth.user.value?.id || 'public'}`,
+        });
+
+        if (error.value) {
+            console.error('Error fetching exhibit details:', error.value);
+            exhibitError.value = error.value.statusMessage || '无法加载展品内容。';
+            exhibit.value = { id: '', title: '', coverUrl: '', description: '', datas: [] };
+        } else if (data.value?.exhibit) {
+            exhibit.value.id = data.value.exhibit.id;
+            exhibit.value.author = data.value.exhibit.author;
+            exhibit.value.privacy = data.value.exhibit.privacy;
+            exhibit.value.title = data.value.exhibit.title;
+            exhibit.value.coverUrl = data.value.exhibit.coverUrl;
+            exhibit.value.description = data.value.exhibit.description;
+            shouldShowToggle.value = data.value.exhibit.description?.length > 150;
+            exhibit.value.datas = data.value.exhibit.datas;
+
+            await nextTick(); // 确保DOM已更新
+            if (galleryContainer.value) {
+                if (galleryInstance.value) {
+                    galleryInstance.value.destroy(true);
+                }
+                galleryInstance.value = lightGallery(galleryContainer.value, {
+                    selector: '.lg-trigger',
+                    plugins: [lgZoom, lgThumbnail],
+                    speed: 300,
+                    download: false,
+                    hash: false,
+                    closable: true,
+                });
+            }
+
+            page.value = 1;
+            await checkFavoriteStatus();
+        } else {
+            exhibitError.value = '未找到展品内容。';
+            exhibit.value = { id: '', title: '', coverUrl: '', description: '', datas: [] };
+        }
+    } catch (err) {
+        console.error('Client-side error fetching exhibit details:', err);
+        exhibitError.value = '发生了一个意外错误。';
+        exhibit.value = { id: '', title: '', coverUrl: '', description: '', datas: [] };
+    } finally {
+        isLoading.value = false;
+    }
+};
 
 const fetchExhibitItems = async (id, append = false) => {
     if (!id || isLoading.value) return;
@@ -350,21 +374,17 @@ const fetchExhibitItems = async (id, append = false) => {
     }
 };
 
-// watch([isLoadingAuth, () => $auth.user.value?.id, () => route.params.id],
-//     async ([newIsLoadingAuth, newUserId, newExhibitId], [oldIsLoadingAuth, oldUserId, oldExhibitId]) => {
-//         if (!newIsLoadingAuth && newExhibitId && (newExhibitId !== oldExhibitId || newUserId !== oldUserId)) {
-//             await fetchExhibitDetails();
-//         }
-//     }, { immediate: true }
-// );
-
-watch(data, (newData) => {
-    exhibit.value = newData || { id: '', title: '', coverUrl: '', description: '', datas: [] }
-}, { immediate: true })
+watch([isLoadingAuth, () => $auth.user.value?.id, () => route.params.id],
+    async ([newIsLoadingAuth, newUserId, newExhibitId], [oldIsLoadingAuth, oldUserId, oldExhibitId]) => {
+        if (!newIsLoadingAuth && newExhibitId && (newExhibitId !== oldExhibitId || newUserId !== oldUserId)) {
+            await fetchExhibitDetails();
+        }
+    }, { immediate: true }
+);
 
 const dynamicCoverStyle = computed(() => {
     if (!exhibit.value.datas || exhibit.value.datas?.length === 0) {
-        return { backgroundImage: 'url(/bg.png)' };
+        return { backgroundImage: 'url(/bg.jpg)' };
     }
 
     const numImages = Math.min(10, exhibit.value.datas.length);
@@ -401,53 +421,97 @@ const generateShareImage = async (item, mode = 'share') => {
 
     const container = document.createElement('div');
     container.style.width = '750px';
-    container.classList.add('share-image-container');
+    container.style.backgroundColor = '#f9f7f5'; // 柔和的米白色背景
+    container.style.display = 'flex';
+    container.style.flexDirection = 'column';
+    container.style.alignItems = 'center';
+    container.style.justifyContent = 'flex-start';
+    container.style.padding = '50px'; // 增加内边距
+    container.style.boxSizing = 'border-box';
+    container.style.position = 'absolute';
+    container.style.left = '-9999px';
+    container.style.top = '-9999px';
+    container.style.borderRadius = '12px'; // 更大的圆角
+    container.style.boxShadow = '0 8px 24px rgba(0, 0, 0, 0.08)'; // 更柔和的阴影
+    container.style.fontFamily = '"Helvetica Neue", Arial, sans-serif'; // 优雅的字体
 
     // 添加艺术装饰元素
     const artDecoTop = document.createElement('div');
-    artDecoTop.classList.add('share-image-art-deco-top');
+    artDecoTop.style.width = '100%';
+    artDecoTop.style.height = '4px';
+    artDecoTop.style.backgroundColor = '#d4b996'; // 金色装饰线
+    artDecoTop.style.marginBottom = '30px';
+    artDecoTop.style.borderRadius = '2px';
     container.appendChild(artDecoTop);
 
     if (item.imageUrl || item.coverUrl) {
         const imgContainer = document.createElement('div');
-        imgContainer.classList.add('share-image-img-container');
-
+        imgContainer.style.width = '100%';
+        imgContainer.style.marginBottom = '30px';
+        imgContainer.style.borderRadius = '8px';
+        imgContainer.style.overflow = 'hidden';
+        imgContainer.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.05)';
+        
         const img = document.createElement('img');
         img.src = item.imageUrl || item.coverUrl;
-        img.classList.add('share-image-img');
-
+        img.style.width = '100%';
+        img.style.height = 'auto';
+        img.style.display = 'block';
+        img.style.objectFit = 'cover';
+        
         imgContainer.appendChild(img);
         container.appendChild(imgContainer);
     }
 
     // 标题容器添加背景和边框
     const titleContainer = document.createElement('div');
-    titleContainer.classList.add('share-image-title-container');
+    titleContainer.style.width = '100%';
+    titleContainer.style.padding = '20px';
+    titleContainer.style.backgroundColor = '#ffffff'; // 纯白背景
+    titleContainer.style.borderRadius = '8px';
+    titleContainer.style.marginBottom = '25px';
+    titleContainer.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.03)';
+    titleContainer.style.borderLeft = '4px solid #d4b996'; // 金色装饰条
 
     const title = document.createElement(item.titleFontTag || 'h2');
     title.textContent = item.title;
-    title.classList.add('share-image-title');
-    title.classList.add(mode === 'share' ? 'share-mode' : 'download-mode');
+    title.style.fontSize = mode === 'share' ? '42px' : '36px';
+    title.style.fontWeight = '600'; // 中等粗体
+    title.style.textAlign = 'left';
+    title.style.margin = '0';
+    title.style.color = '#3a3a3a'; // 深灰替代纯黑
+    title.style.lineHeight = '1.3';
+    title.style.letterSpacing = '-0.5px'; // 紧凑字距
     titleContainer.appendChild(title);
     container.appendChild(titleContainer);
 
     if (item.description) {
         const description = document.createElement('div');
         description.textContent = item.description;
-        description.classList.add('share-image-description');
-        description.classList.add(mode === 'share' ? 'share-mode' : 'download-mode');
+        description.style.fontSize = mode === 'share' ? '30px' : '24px';
+        description.style.textAlign = 'left';
+        description.style.color = '#5c5c5c'; // 中灰色
+        description.style.lineHeight = '1.6';
+        description.style.whiteSpace = 'pre-wrap';
+        description.style.padding = '0 10px';
+        description.style.fontFamily = '"Georgia", serif'; // 优雅衬线字体
         container.appendChild(description);
     }
 
     // 添加底部水印
     const watermark = document.createElement('div');
-    watermark.classList.add('share-image-watermark');
+    watermark.style.width = '100%';
+    watermark.style.textAlign = 'center';
+    watermark.style.marginTop = '30px';
+    watermark.style.paddingTop = '20px';
+    watermark.style.borderTop = '1px solid #eae6e0'; // 柔和的边框
+    watermark.style.color = '#a0a0a0'; // 浅灰色
+    watermark.style.fontSize = '24px';
     watermark.textContent = 'Personal Museum · 数字艺术收藏';
     container.appendChild(watermark);
 
     document.body.appendChild(container);
 
-    await nextTick(); // 确保DOM完全渲染
     try {
         const canvas = await html2canvas(container, {
             useCORS: true,
@@ -636,35 +700,10 @@ const handleScroll = throttle(() => {
     }
 }, 300);
 
-const shareUrl = ref('');
-const canUseDOM = typeof window !== 'undefined';
-
 onMounted(async () => {
-    // 设置分享 URL
-    if (process.client) {
-        shareUrl.value = window.location.href
-        window.addEventListener('scroll', handleScroll)
-    }
-
-    // 初始化 lightGallery
-    await nextTick()
-    if (galleryContainer.value) {
-        if (galleryInstance.value) {
-            galleryInstance.value.destroy(true)
-        }
-        galleryInstance.value = lightGallery(galleryContainer.value, {
-            selector: '.lg-trigger',
-            plugins: [lgZoom, lgThumbnail],
-            speed: 300,
-            download: false,
-            hash: false,
-            closable: true
-        })
-    }
-
-    // 检查收藏状态
-    await checkFavoriteStatus()
-})
+    window.addEventListener('scroll', handleScroll);
+    await fetchExhibitDetails();
+});
 
 onUnmounted(() => {
     window.removeEventListener('scroll', handleScroll);
@@ -727,8 +766,9 @@ const checkFavoriteStatus = async () => {
     }
 };
 
-
-
+const shareUrl = computed(() => {
+    return window.location.href;
+});
 
 const copyLink = async () => {
     try {
